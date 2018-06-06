@@ -36,6 +36,8 @@ App({
   },
   globalData: {
     userInfo: null,
-    taskCount: 0
+    taskCount: 0,
+    selectedDays: [],
+    selectedDaysSize: 0, 
   }
 })

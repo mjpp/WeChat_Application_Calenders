@@ -3,6 +3,7 @@ const years = []
 const months = []
 const days = []
 const name = "gzy"
+const task = ''
 
 for (let i = 1990; i <= date.getFullYear(); i++) {
   years.push(i)
@@ -41,6 +42,14 @@ Page({
     value: [9999, 1, 1],
 
     taskKeyList: '',
+    showModalStatus: false,
+
+    // temp 
+    tempTaskID: '',
+    tempTaskName: '',
+    tempTaskContent: '',
+    tempUserName: '',
+    tempSelectedDays: ','
   },
   onLoad: function (options) {
     var currentObj = this.getCurrentDayString()
@@ -139,35 +148,89 @@ Page({
       taskKeyList[i] = 0;
     }
 
+
     that.setData({
       currentDayList: currentDayList,
       currentDayStates: currentDayStates,
       currentDayHaveTaskStates: currentDayHaveTaskStates,
       taskKeyList: taskKeyList
     })
+
+    this.modifyDayStates();
+
   },
   onClick: function (e) {
     var that = this;
     var key = e.currentTarget.id;
-    var s = that.data.currentDayStates
-    s[key] = !s[key];
-    this.setData({
-      currentDayStates: s
-    })
-    // 依據是true的印出selected date
-    var s1 = that.data.currentDayList;
-    var s2 = that.data.currentDayStates;
-    var cur = that.data.currentDate;
-    var results = [];
-    for (var i = 0; i < s1.length; i++) {
-      if (s2[i]) {
-        results[i] = cur.substr(0, 7) + s1[i] + "日";
-        // console.log(cur.substr(0, 7) + s1[i] + "日");
+    var s3 = that.data.currentDayHaveTaskStates;
+    var s4 = that.data.taskKeyList;
+
+    if (this.data.isFormOpen) {
+      // toggle green
+      // var s = that.data.currentDayStates
+      // s[key] = !s[key];
+      // this.setData({
+      //   currentDayStates: s
+      // })
+      // // travse currentDayStates and store selectedDays
+      // var s1 = that.data.currentDayList;
+      // var s2 = that.data.currentDayStates;
+      // var cur = that.data.currentDate;
+      // var results = [];
+      // for (var i = 0; i < s1.length; i++) {
+      //   if (s2[i]) {
+      //     results[i] = cur.substr(0, 7) + s1[i] + "日";
+      //     // console.log(cur.substr(0, 7) + s1[i] + "日");
+      //     app.globalData.selectedDays[app.globalData.selectedDays.length] = results[i];
+      //     console.log(app.globalData.selectedDays);
+      //   }
+      // }
+      // this.setData({
+      //   selectedDays: results
+      // })
+      var s = that.data.currentDayStates
+      var s1 = that.data.currentDayList;
+      var cur = that.data.currentDate;
+      if (!s[key]) {
+        s[key] = !s[key];
+        this.setData({
+          currentDayStates: s
+        })
+        // day
+        var day = s1[key];
+
+        // month
+        var month;
+        if (cur.substr(6, 1) == '月') {
+          month = cur.substr(5, 1);
+        } else {
+          month = cur.substr(5, 2);
+        }
+        // year
+        var year = cur.substr(0, 4);
+
+        app.globalData.selectedDays[app.globalData.selectedDaysSize++] = {
+          month: month,
+          year: year,
+          day: day,
+          key: key,
+        };
+        console.log(app.globalData.selectedDays);
       }
+      var results = [];
+      for (var i = 0; i < app.globalData.selectedDaysSize; i++) {
+        let selectedDay = app.globalData.selectedDays[i];
+        results[i] = selectedDay.year + "年" + selectedDay.month + "月" + selectedDay.day + "日";
+      }
+      this.setData({
+        selectedDays: results
+      })
+
+    } else if (s3[key]) {
+      // yellow, if click on the day have tasks, show the tasks
+      this.getToTask(s4[key]);
     }
-    this.setData({
-      selectedDays: results
-    })
+
   },
   formSubmit: function (e) {
     console.log('form发生了submit事件，携带数据为：', e.detail.value);
@@ -178,13 +241,15 @@ Page({
     var s2 = that.data.currentDayStates;
     var s3 = that.data.taskKeyList;
     var j = 0;
-    var taskArray = []
+    var empty = true;
+    // var taskArray = []
     for (var i = 0; i < s.length; i++) {
       if (s[i] != null) {
+        empty = false;
         s1[i] = true;
         s2[i] = false;
         s3[i] = taskKey;
-        taskArray[j] = s[i];
+        // taskArray[j] = s[i];
         j++
       }
     }
@@ -196,25 +261,29 @@ Page({
       currentDayStates: s2,
       taskKeyList: s3,
     })
-
-    // data storage
-    var taskKeyString = taskKey + '';
-    // console.log(taskKeyString);
-    wx.setStorage({
-      key: taskKeyString,
-      data: {
-        taskId: taskKeyString,
-        userID: '',
-        groupID: '',
-        isGroupTask: e.detail.value.switch,
-        importance: e.detail.value.slider,
-        taskName: e.detail.value.input,
-        content: e.detail.value.textarea,
-        userName: name,
-        selectedDays: taskArray,
-      }
-    })
-    console.log("taskKeyList: " + s3);
+    if (!empty) {
+      // data storage
+      var taskKeyString = taskKey + '';
+      // console.log(taskKeyString);
+      wx.setStorage({
+        key: taskKeyString,
+        data: {
+          taskID: taskKeyString,
+          userID: '',
+          groupID: '',
+          isGroupTask: e.detail.value.switch,
+          importance: e.detail.value.slider,
+          taskName: e.detail.value.input,
+          content: e.detail.value.textarea,
+          userName: name,
+          selectedDays: app.globalData.selectedDays,
+        }
+      })
+      // console.log("taskKeyList: " + s3);
+    }
+    else {
+      app.globalData.taskCount--;
+    }
   },
   formReset: function () {
     console.log('form发生了reset事件');
@@ -225,8 +294,44 @@ Page({
     })
   },
   closeAddingTask: function () {
+    var that = this;
+    var cur = this.data.currentDate;
+    var s = that.data.currentDayStates;
+    for (var i = 0; i < app.globalData.selectedDaysSize; i++) {
+      let selectedDay = app.globalData.selectedDays[i];
+      var m = selectedDay.month;
+      // current month
+      var cm
+      if (cur.substr(6, 1) == '月') {
+        cm = cur.substr(5, 1);
+      } else {
+        cm = cur.substr(5, 2);
+      }
+      if (m == cm) {
+        s[selectedDay.key] = false;
+      }
+    }
+    // this.setData({
+    //   currentDayStates: s,
+    // })
+    // var that = this;
+    // var s = that.data.selectedDays;
+    // var s2 = that.data.currentDayStates;
+    // // 同一個月
+    // // 用key
+    // // purpose toggle green
+    // for (var i = 0; i < s.length; i++) {
+    //   if (s[i] != null) {
+    //     s2[i] = false;
+    //   }
+    // // }
+    // s = '';
+    app.globalData.selectedDays = [];
+    app.globalData.selectedDaysSize = 0;
     this.setData({
-      isFormOpen: false
+      currentDayStates: s,
+      isFormOpen: false,
+      selectedDays: '',
     })
   },
   bindChange: function (e) {
@@ -248,6 +353,96 @@ Page({
         }
       })
     }
-
   },
+  getToTask: function (key) {
+    var taskKeyString = key + '';
+    var task = wx.getStorageSync(taskKeyString);
+    console.log(task);
+    this.setData({
+      tempTaskID: task.taskID,
+      tempTaskName: task.taskName,
+      tempTaskContent: task.content,
+      tempUserName: task.userName,
+      tempSelectedDays: task.selectedDays,
+      showModalStatus: true,
+    })
+  },
+  closeTask: function () {
+    this.setData({
+      showModalStatus: false,
+    })
+  },
+  powerDrawer: function (e) {
+    var currentStatu = e.currentTarget.dataset.statu;
+    this.util(currentStatu)
+  },
+  util: function (currentStatu) {
+    /* 动画部分 */
+    // 第1步：创建动画实例
+    var animation = wx.createAnimation({
+      duration: 200, //动画时长
+      timingFunction: "linear", //线性
+      delay: 0 //0则不延迟
+    });
+    // 第2步：这个动画实例赋给当前的动画实例  
+    this.animation = animation;
+
+    // 第3步：执行第一组动画  
+    animation.opacity(0).rotateX(-100).step();
+
+    // 第4步：导出动画对象赋给数据对象储存  
+    this.setData({
+      animationData: animation.export()
+    })
+
+    // 第5步：设置定时器到指定时候后，执行第二组动画  
+    setTimeout(function () {
+      // 执行第二组动画  
+      animation.opacity(1).rotateX(0).step();
+      // 给数据对象储存的第一组动画，更替为执行完第二组动画的动画对象  
+      this.setData({
+        animationData: animation
+      })
+
+      //关闭  
+      if (currentStatu == "close") {
+        this.setData(
+          {
+            showModalStatus: false
+          }
+        );
+      }
+    }.bind(this), 200)
+
+    // 显示  
+    if (currentStatu == "open") {
+      this.setData(
+        {
+          showModalStatus: true
+        }
+      );
+    }
+  },
+  modifyDayStates: function() {
+    var that = this;
+    var cur = this.data.currentDate;
+    var s = that.data.currentDayStates;
+    for (var i = 0; i < app.globalData.selectedDaysSize; i++) {
+      let selectedDay = app.globalData.selectedDays[i];
+      var m = selectedDay.month;
+      // current month
+      var cm
+      if (cur.substr(6, 1) == '月') {
+        cm = cur.substr(5, 1);
+      } else {
+        cm = cur.substr(5, 2);
+      }
+      if(m==cm){
+        s[selectedDay.key] = true;
+      }
+    }
+    this.setData({
+      currentDayStates: s,
+    })
+  }
 })  

@@ -39,6 +39,8 @@ Page({
     days: days,
     day: 2,
     value: [9999, 1, 1],
+
+    taskKeyList: '',
   },
   onLoad: function (options) {
     var currentObj = this.getCurrentDayString()
@@ -115,6 +117,7 @@ Page({
     var currentDayHaveTaskStates = []
     var currentDayList = []
     var currentDayStates = []
+    var taskKeyList = []
     var f = 0
     // why condition i < 42?
     // 最多42個
@@ -133,12 +136,14 @@ Page({
       }
       currentDayStates[i] = false;
       currentDayHaveTaskStates[i] = false;
+      taskKeyList[i] = 0;
     }
 
     that.setData({
       currentDayList: currentDayList,
       currentDayStates: currentDayStates,
-      currentDayHaveTaskStates: currentDayHaveTaskStates
+      currentDayHaveTaskStates: currentDayHaveTaskStates,
+      taskKeyList: taskKeyList
     })
   },
   onClick: function (e) {
@@ -157,7 +162,7 @@ Page({
     for (var i = 0; i < s1.length; i++) {
       if (s2[i]) {
         results[i] = cur.substr(0, 7) + s1[i] + "日";
-        console.log(cur.substr(0, 7) + s1[i] + "日");
+        // console.log(cur.substr(0, 7) + s1[i] + "日");
       }
     }
     this.setData({
@@ -166,17 +171,19 @@ Page({
   },
   formSubmit: function (e) {
     console.log('form发生了submit事件，携带数据为：', e.detail.value);
-
+    var taskKey = ++app.globalData.taskCount;
     var that = this;
     var s = that.data.selectedDays;
     var s1 = that.data.currentDayHaveTaskStates;
     var s2 = that.data.currentDayStates;
+    var s3 = that.data.taskKeyList;
     var j = 0;
     var taskArray = []
     for (var i = 0; i < s.length; i++) {
       if (s[i] != null) {
         s1[i] = true;
         s2[i] = false;
+        s3[i] = taskKey;
         taskArray[j] = s[i];
         j++
       }
@@ -187,12 +194,16 @@ Page({
       selectedDays: s,
       currentDayHaveTaskStates: s1,
       currentDayStates: s2,
+      taskKeyList: s3,
     })
 
     // data storage
+    var taskKeyString = taskKey + '';
+    // console.log(taskKeyString);
     wx.setStorage({
-      key: "key",
+      key: taskKeyString,
       data: {
+        taskId: taskKeyString,
         userID: '',
         groupID: '',
         isGroupTask: e.detail.value.switch,
@@ -203,6 +214,7 @@ Page({
         selectedDays: taskArray,
       }
     })
+    console.log("taskKeyList: " + s3);
   },
   formReset: function () {
     console.log('form发生了reset事件');
@@ -226,11 +238,16 @@ Page({
     })
   },
   getTasksInfo: function () {
-    wx.getStorage({
-      key: 'key',
-      success: function (res) {
-        console.log(res.data)
-      }
-    })
+    for (var i = 1; i <= app.globalData.taskCount; i++) {
+      var taskKeyString = i + '';
+      console.log(taskKeyString);
+      wx.getStorage({
+        key: taskKeyString,
+        success: function (res) {
+          console.log(res.data);
+        }
+      })
+    }
+
   },
 })  

@@ -1,0 +1,157 @@
+<view class="page">
+
+
+
+  <view class="box">
+
+    <view class="box-flex">
+
+      <view class="flex-item">
+        <view class="item-content transparent">
+        </view>
+      </view>
+      <view class="flex-item">
+        <button type="default" bindtap="getTasksInfo" >getTasksInfo</button>
+      </view>
+      <view class="flex-item">
+        <button type="primary" bindtap="closeAddingTask" wx:if="{{isFormOpen}}"> Close task </button>
+        <button type="primary" bindtap="startAddingTask" wx:else> Add task </button>
+      </view>
+
+
+    </view>
+
+    <view class="box-flex">
+
+      <view class="flex-item">
+        <view class="item-content" bindtap="doDay" data-key='left'>
+          <view class="glyphicon glyphicon-triangle-left"></view>
+        </view>
+      </view>
+
+      <view class="flex-item item-content-current-day">
+        <view class="item-content">{{currentDate}}</view>
+      </view>
+
+      <view class="flex-item">
+        <view class="item-content" bindtap="doDay" data-key="right">
+          <view class="glyphicon glyphicon-triangle-right"></view>
+        </view>
+      </view>
+
+    </view>
+
+    <view class="box-flex">
+      <view class="flex-item">
+        <view class="item-content">一</view>
+      </view>
+      <view class="flex-item">
+        <view class="item-content">二</view>
+      </view>
+      <view class="flex-item">
+        <view class="item-content">三</view>
+      </view>
+      <view class="flex-item">
+        <view class="item-content">四</view>
+      </view>
+      <view class="flex-item">
+        <view class="item-content">五</view>
+      </view>
+      <view class="flex-item">
+        <view class="item-content">六</view>
+      </view>
+      <view class="flex-item">
+        <view class="item-content">日</view>
+      </view>
+    </view>
+
+    <view class="box-flex">
+      <view class="flex-item" wx:for="{{currentDayList}}" wx:for-index='key' wx:for-item="vo" wx:key="{{key}}" id="{{key}}" bindtap="onClick">
+        <view class="item-content" 
+        wx:if="{{(currentDay != vo || !isCurrentMonth) && !currentDayStates[key] && !currentDayHaveTaskStates[key] }}">{{vo}}</view>
+        <view class="item-content bk-color-day" 
+        wx:if="{{currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key]}}">{{vo}}</view>
+        <view class="item-content select-color-day" wx:if="{{currentDayStates[key] && !currentDayHaveTaskStates[key]}}">{{vo}}</view>
+        <view class="item-content have-task" wx:if="{{currentDayHaveTaskStates[key] }}">{{vo}}</view>
+
+      </view>
+    </view>
+
+    <form bindsubmit="formSubmit" bindreset="formReset" wx:if="{{isFormOpen}}">
+
+      <text>
+    Selected dates:
+    </text>
+      <text wx:for="{{selectedDays}}" wx:for-index='key' wx:for-item="item" wx:key="{{key}}" id="{{key}}"> 
+        <text  wx:if="{{item != null}}">{{item}}
+        </text>
+      </text>
+
+
+      <view class="section section_gap">
+        <view class="section__title">Group Task</view>
+        <switch name="switch" />
+      </view>
+      <view class="section section_gap">
+        <view class="section__title">Importance</view>
+        <slider name="slider" show-value></slider>
+      </view>
+
+      <view class="section">
+        <view class="section__title">Task name</view>
+        <input name="input" placeholder="please input here" />
+      </view>
+
+      <view class="section">
+        <view class="section__title">Task content</view>
+        <textarea placeholder="form 中的 textarea" name="textarea"/>
+      </view>
+
+
+      <!-- radio & checkbox -->
+      <!-- <view class="section section_gap">
+      <view class="section__title">radio</view>
+      <radio-group name="radio-group">
+        <label><radio value="radio1"/>radio1</label>
+        <label><radio value="radio2"/>radio2</label>
+      </radio-group>
+    </view> -->
+      <!-- <view class="section section_gap">
+      <view class="section__title">checkbox</view>
+      <checkbox-group name="checkbox">
+        <label><checkbox value="checkbox1"/>checkbox1</label>
+        <label><checkbox value="checkbox2"/>checkbox2</label>
+      </checkbox-group>
+    </view> -->
+
+      <!-- <view>
+        <view>{{year}}年{{month}}月{{day}}日</view>
+        <picker-view indicator-style="height: 50px;" style="width: 100%; height: 300px;" value="{{value}}" bindchange="bindChange">
+          <picker-view-column>
+            <view wx:for="{{years}}" style="line-height: 50px">{{item}}年</view>
+          </picker-view-column>
+          <picker-view-column>
+            <view wx:for="{{months}}" style="line-height: 50px">{{item}}月</view>
+          </picker-view-column>
+          <picker-view-column>
+            <view wx:for="{{days}}" style="line-height: 50px">{{item}}日</view>
+          </picker-view-column>
+        </picker-view>
+      </view> -->
+      <view class="btn-area">
+        <button formType="submit">Submit</button>
+        <button formType="reset">Reset</button>
+        <button type="warn" bindtap="closeAddingTask">Cancel adding task</button>
+      </view>
+
+    </form>
+
+    <!-- Debug -->
+    <!-- <view>
+      Is this month current month
+      <view>{{isCurrentMonth}}</view> 
+       <view>{{year}}年{{month}}月{{day}}日</view> 
+    </view> -->
+
+  </view>
+</view>

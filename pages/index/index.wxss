@@ -1,0 +1,91 @@
+/**index.wxss**/
+/*
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.userinfo-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  margin: 20rpx;
+  border-radius: 50%;
+}
+
+.userinfo-nickname {
+  color: #aaa;
+}
+
+.usermotto {
+  margin-top: 200px;
+}
+*/
+@import '../../dist/css/icon.wxss';  
+page {  
+  background-color: #2a8cef;  
+  background:-webkit-gradient(linear, 0 0, 0 bottom, from(#999), to(#999));  
+  display: flex;  
+  flex-direction: column;  
+  width: 100%;  
+  height: 100%;  
+  flex-wrap: nowrap;  
+  justify-content: flex-start;  
+  align-items: stretch;  
+  font-size: 14px;  
+}  
+  
+.box {  
+  display: block;  
+  margin: 10px;  
+}  
+  
+.box-flex {  
+  display: -webkit-box;  
+  display: -webkit-flex;  
+  display: flex;  
+  flex-wrap: wrap;  
+}  
+  
+.flex-item {  
+  flex-flow: nowrap;  
+  flex-grow: 1;  
+  flex-shrink: 1;  
+  width: 14.2%;  
+}  
+  
+.item-content {  
+  margin: 5px;  
+  padding: 0 10px;  
+  text-align: center;  
+  background-color: #333;  
+  height: 2rem;  
+  line-height: 2rem;  
+  color: #fff;  
+}  
+  
+.bk-color-day {  
+  background-color: #666666;  
+}  
+
+.transparent {
+  visibility: hidden;
+}
+
+.add-task {
+  background-color: #EEEEEE;
+  margin-left: 18%;
+  color: black;
+}
+
+.select-color-day {
+  background-color: green; 
+}
+
+.have-task {
+  background-color: orange;
+}
+
+.item-content-current-day {  
+  flex-grow: 2;  
+}  

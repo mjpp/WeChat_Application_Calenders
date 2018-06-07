@@ -22,6 +22,8 @@ Page({
   data: {
     // currentDate: "2017年05月03日",
     name: name,
+    userID: '',
+
     currentDate: '',
     dayList: '',
     currentDayList: '',
@@ -41,7 +43,8 @@ Page({
     day: 2,
     value: [9999, 1, 1],
 
-    taskKeyList: '',
+    taskKeyList: [],
+    taskKeyListSize: [],
     showModalStatus: false,
 
     // temp 
@@ -60,6 +63,7 @@ Page({
       currentObj: currentObj
     })
     this.setSchedule(currentObj)
+    this.getThisUserInfo()
   },
   doDay: function (e) {
     var that = this
@@ -127,6 +131,7 @@ Page({
     var currentDayList = []
     var currentDayStates = []
     var taskKeyList = []
+    var taskKeyListSize = []
     var f = 0
     // why condition i < 42?
     // 最多42個
@@ -145,15 +150,17 @@ Page({
       }
       currentDayStates[i] = false;
       currentDayHaveTaskStates[i] = false;
-      taskKeyList[i] = 0;
+      taskKeyList[i] = [];
+      taskKeyListSize[i] = 0;
     }
 
-
+    // console.log(taskKeyList);
     that.setData({
       currentDayList: currentDayList,
       currentDayStates: currentDayStates,
       currentDayHaveTaskStates: currentDayHaveTaskStates,
-      taskKeyList: taskKeyList
+      taskKeyList: taskKeyList,
+      taskKeyListSize: taskKeyListSize
     })
 
     this.modifyDayStates();
@@ -268,6 +275,9 @@ Page({
     var s1 = that.data.currentDayHaveTaskStates;
     var s2 = that.data.currentDayStates;
     var s3 = that.data.taskKeyList;
+    console.log("@");
+    console.log(s3);
+    var s4 = that.data.taskKeyListSize;
     var j = 0;
     var empty;
     // var taskArray = []
@@ -294,7 +304,8 @@ Page({
       }
       if (m == cm) {
         s1[selectedDay.key] = true;
-        s3[selectedDay.key] = taskKey;
+        s3[selectedDay.key][s4[selectedDay.key]] = taskKey;
+        s4[selectedDay.key]++;
       }
     }
 
@@ -305,6 +316,7 @@ Page({
       currentDayHaveTaskStates: s1,
       currentDayStates: s2,
       taskKeyList: s3,
+      taskKeyListSize: s4,
     })
     if (!empty) {
       // data storage
@@ -322,6 +334,7 @@ Page({
           content: e.detail.value.textarea,
           userName: name,
           selectedDays: app.globalData.selectedDays,
+          status: 'processing',
         }
       })
 
@@ -402,78 +415,28 @@ Page({
       })
     }
   },
-  getToTask: function (key) {
-    var taskKeyString = key + '';
-    var task = wx.getStorageSync(taskKeyString);
-    var days = [];
-    for (var i = 0; i < task.selectedDays.length; i++) {
-      days[i] = task.selectedDays[i].year + "/" + task.selectedDays[i].month + "/" + task.selectedDays[i].day;
-    }
-    console.log(task);
-    this.setData({
-      tempTaskID: task.taskID,
-      tempTaskName: task.taskName,
-      tempTaskContent: task.content,
-      tempUserName: task.userName,
-      tempSelectedDays: days,
-      showModalStatus: true,
-    })
+  getToTask: function (keyList) {
+    // var taskKeyString = key + '';
+    // var task = wx.getStorageSync(taskKeyString);
+    // var days = [];
+    // for (var i = 0; i < task.selectedDays.length; i++) {
+    //   days[i] = task.selectedDays[i].year + "/" + task.selectedDays[i].month + "/" + task.selectedDays[i].day;
+    // }
+    // console.log(task);
+    // this.setData({
+    //   tempTaskID: task.taskID,
+    //   tempTaskName: task.taskName,
+    //   tempTaskContent: task.content,
+    //   tempUserName: task.userName,
+    //   tempSelectedDays: days,
+    //   showModalStatus: true,
+    // })
+    console.log(keyList);
   },
   closeTask: function () {
     this.setData({
       showModalStatus: false,
     })
-  },
-  powerDrawer: function (e) {
-    var currentStatu = e.currentTarget.dataset.statu;
-    this.util(currentStatu)
-  },
-  util: function (currentStatu) {
-    /* 动画部分 */
-    // 第1步：创建动画实例
-    var animation = wx.createAnimation({
-      duration: 200, //动画时长
-      timingFunction: "linear", //线性
-      delay: 0 //0则不延迟
-    });
-    // 第2步：这个动画实例赋给当前的动画实例  
-    this.animation = animation;
-
-    // 第3步：执行第一组动画  
-    animation.opacity(0).rotateX(-100).step();
-
-    // 第4步：导出动画对象赋给数据对象储存  
-    this.setData({
-      animationData: animation.export()
-    })
-
-    // 第5步：设置定时器到指定时候后，执行第二组动画  
-    setTimeout(function () {
-      // 执行第二组动画  
-      animation.opacity(1).rotateX(0).step();
-      // 给数据对象储存的第一组动画，更替为执行完第二组动画的动画对象  
-      this.setData({
-        animationData: animation
-      })
-
-      //关闭  
-      if (currentStatu == "close") {
-        this.setData(
-          {
-            showModalStatus: false
-          }
-        );
-      }
-    }.bind(this), 200)
-
-    // 显示  
-    if (currentStatu == "open") {
-      this.setData(
-        {
-          showModalStatus: true
-        }
-      );
-    }
   },
   modifyDayStates: function () {
     var that = this;
@@ -502,10 +465,12 @@ Page({
     var cur = this.data.currentDate;
     var s = that.data.currentDayHaveTaskStates;
     var s1 = that.data.taskKeyList;
+    var s2 = that.data.taskKeyListSize;
     for (var i = 1; i <= app.globalData.taskCount; i++) {
       var taskKeyString = i + '';
       var task = wx.getStorageSync(taskKeyString);
       var days = task.selectedDays;
+
       for (var j = 0; j < days.length; j++) {
         var m = days[j].month;
         // current month
@@ -516,14 +481,46 @@ Page({
           cm = cur.substr(5, 2);
         }
         if (m == cm) {
-          s[days[j].key] = true;
-          s1[days[j].key] = i;
+          if (task.status == 'completed') {
+            s[days[j].key] = false;
+          } else {
+            s[days[j].key] = true;
+          }
+          s1[days[j].key][s2[days[j].key]] = i;
+          s2[days[j].key]++;
         }
       }
+
     }
     this.setData({
       currentDayHaveTaskStates: s,
       taskKeyList: s1,
+      taskKeyListSize: s2,
+    })
+
+  },
+  setTaskComplete: function (e) {
+    var taskKey = this.data.tempTaskID;
+    var taskKeyString = taskKey + '';
+    var task = wx.getStorageSync(taskKeyString);
+    var temp = Object.assign({}, task)
+    temp.status = 'completed';
+    wx.setStorageSync(taskKeyString, temp);
+    this.setData({
+      showModalStatus: false,
+    })
+    this.modifyDayHaveTaskStates();
+    console.log(this.data.currentDayHaveTaskStates);
+  },
+  getThisUserInfo: function(){
+    wx.getUserInfo({
+      withCredentials: true,
+      lang: '',
+      success: function (res) {
+        console.log(res);
+       },
+      fail: function (res) { },
+      complete: function (res) { },
     })
   }
 })  

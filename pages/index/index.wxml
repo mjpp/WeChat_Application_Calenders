@@ -1,6 +1,6 @@
 <view class="page">
 
-  <view animation="{{animationData}}" class="drawer_box" wx:if="{{showModalStatus}}">
+  <view  class="drawer_box" wx:if="{{showModalStatus}}">
     <view class="drawer_title">{{tempTaskID}}</view>
     <view class="drawer_content">
       <view class="top grid">
@@ -24,7 +24,8 @@
         <input class="input_base input_h30 col-1" name="bz"></input>
       </view>
     </view>
-    <button type="default" bindtap="closeTask">確認</button>
+    <button type="default" bindtap="closeTask">關閉</button>
+    <button type="warn" bindtap="setTaskComplete">將任務設置成已完成</button>
   </view>
 
   <view class="box">

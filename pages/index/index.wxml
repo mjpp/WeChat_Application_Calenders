@@ -1,11 +1,11 @@
 <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 進入小程序 </button>
- 
+
 <view class="page" wx:if="{{hasUserInfo}}">
   <scroll-view scroll-y="true" style="height: 50%;" class="drawer_box" wx:if="{{showModalStatus}}">
-    <view wx:for="{{tempTaskID}}" wx:for-index='key' wx:key="{{key}}" >
+    <view wx:for="{{tempTaskID}}" wx:for-index='key' wx:key="{{key}}">
       <view class="drawer_title">{{tempTaskID[key]}}</view>
       <view class="drawer_content">
-         <view class="top grid">
+        <view class="top grid">
           <label class="title col-0">标题</label>
           <view class="input_base input_h30 col-1" name="rName" value="可自行定义内容">{{tempTaskName[key] || "no title"}}</view>
         </view>
@@ -24,19 +24,19 @@
         <view class="top bottom grid">
           <label class="title col-0">备注</label>
           <input class="input_base input_h30 col-1" name="bz"></input>
-        </view> 
+        </view>
       </view>
-        <view class="section__title">是否與他人共享</view>
-        <switch name="是否與他人共享"  bindchange="groupSwitchClick"/>
-      <button type="warn" bindtap="setTaskComplete">將此任務設置成已完成</button>
+      <view class="section__title">是否與他人共享</view>
+      <switch name="是否與他人共享" bindchange="groupSwitchClick" />
+      <button type="warn" bindtap="setTaskComplete" id="{{key}}">將此任務設置成已完成</button>
     </view>
     <button type="default" bindtap="closeTask">關閉</button>
   </scroll-view>
-  
+
   <text>{{userInfo.nickName}} / </text>
   <text>{{userID}}</text>
   <view class="box">
-    
+
     <view class="box-flex">
       <!-- <view class="flex-item">
         <button type="default" bindtap="getToTask">getToTask</button>

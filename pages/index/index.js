@@ -82,7 +82,7 @@ Page({
     }
     return {
       title: '自定义转发标题',
-      path: '/pages/index/index?uname='+ this.data.userInfo.nickName,
+      path: '/pages/index/index?uname=' + this.data.userInfo.nickName,
     }
   },
   getInviteCode: function (options) {
@@ -536,13 +536,11 @@ Page({
           cm = cur.substr(5, 2);
         }
         if (m == cm) {
-          if (task.status == 'completed') {
-            s[days[j].key] = false;
-          } else {
+          if (task.status != 'completed') {
             s[days[j].key] = true;
+            s1[days[j].key][s2[days[j].key]] = i;
+            s2[days[j].key]++;
           }
-          s1[days[j].key][s2[days[j].key]] = i;
-          s2[days[j].key]++;
         }
       }
 
@@ -552,10 +550,11 @@ Page({
       taskKeyList: s1,
       taskKeyListSize: s2,
     })
-
   },
   setTaskComplete: function (e) {
-    var taskKey = this.data.tempTaskID;
+    var id = e.currentTarget.id;
+    var taskKey = this.data.tempTaskID[id];
+
     var taskKeyString = taskKey + '';
     var task = wx.getStorageSync(taskKeyString);
     var temp = Object.assign({}, task)
@@ -564,10 +563,30 @@ Page({
     this.setData({
       showModalStatus: false,
     })
+
+    var that = this;
+    var currentDayHaveTaskStates = []
+    var currentDayStates = []
+    var taskKeyList = []
+    var taskKeyListSize = []
+    for (var i = 0; i < 42; i++) {
+      currentDayStates[i] = false;
+      currentDayHaveTaskStates[i] = false;
+      taskKeyList[i] = [];
+      taskKeyListSize[i] = 0;
+    }
+
+    // console.log(taskKeyList);
+    that.setData({
+      currentDayStates: currentDayStates,
+      currentDayHaveTaskStates: currentDayHaveTaskStates,
+      taskKeyList: taskKeyList,
+      taskKeyListSize: taskKeyListSize
+    })
+
     this.modifyDayHaveTaskStates();
-    // console.log(this.data.currentDayHaveTaskStates);
   },
-  setUserInfo: function() {
+  setUserInfo: function () {
     if (app.globalData.userInfo) {
       this.setData({
         userInfo: app.globalData.userInfo,
@@ -604,14 +623,14 @@ Page({
     })
     console.log("已獲得使用者數據: ");
     console.log(this.data);
-    console.log("進入小程序");    
+    console.log("進入小程序");
   },
-  groupSwitchClick: function(e) {
+  groupSwitchClick: function (e) {
     console.log(e.detail.value);
     this.setData({
       isTempGroup: e.detail.value,
     })
-    if (this.data.isTempGroup){
+    if (this.data.isTempGroup) {
       // open the sharing function
     } else {
       // close the sharing function if it's opened

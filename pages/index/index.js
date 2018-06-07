@@ -157,7 +157,7 @@ Page({
     })
 
     this.modifyDayStates();
-
+    this.modifyDayHaveTaskStates();
   },
   onClick: function (e) {
     var that = this;
@@ -216,6 +216,34 @@ Page({
           key: key,
         };
         console.log(app.globalData.selectedDays);
+      } else {
+        // delete
+        // 1. become black
+        s[key] = !s[key];
+        this.setData({
+          currentDayStates: s
+        })
+        // 2. delete item in the selectedDays
+        var day = s1[key];
+
+        // month
+        var month;
+        if (cur.substr(6, 1) == '月') {
+          month = cur.substr(5, 1);
+        } else {
+          month = cur.substr(5, 2);
+        }
+        // year
+        var year = cur.substr(0, 4);
+        // 3. decrease app.globalData.selectedDaysSize
+        for (var i = app.globalData.selectedDaysSize - 1; i >= 0; i--) {
+          let selectedDay = app.globalData.selectedDays[i];
+          if (selectedDay.year == year && selectedDay.month == month && selectedDay.day == day) {
+            app.globalData.selectedDays.splice(i, 1);
+            app.globalData.selectedDaysSize--;
+          }
+        }
+
       }
       var results = [];
       for (var i = 0; i < app.globalData.selectedDaysSize; i++) {
@@ -241,18 +269,35 @@ Page({
     var s2 = that.data.currentDayStates;
     var s3 = that.data.taskKeyList;
     var j = 0;
-    var empty = true;
+    var empty;
     // var taskArray = []
-    for (var i = 0; i < s.length; i++) {
-      if (s[i] != null) {
-        empty = false;
-        s1[i] = true;
-        s2[i] = false;
-        s3[i] = taskKey;
-        // taskArray[j] = s[i];
-        j++
+    if (s.length == 0) {
+      empty = true;
+    } else {
+      empty = false;
+    }
+    for (var i = 0; i < s2.length; i++) {
+      s2[i] = false;
+    }
+    var that = this;
+    var cur = this.data.currentDate;
+
+    for (var i = 0; i < app.globalData.selectedDaysSize; i++) {
+      let selectedDay = app.globalData.selectedDays[i];
+      var m = selectedDay.month;
+      // current month
+      var cm
+      if (cur.substr(6, 1) == '月') {
+        cm = cur.substr(5, 1);
+      } else {
+        cm = cur.substr(5, 2);
+      }
+      if (m == cm) {
+        s1[selectedDay.key] = true;
+        s3[selectedDay.key] = taskKey;
       }
     }
+
     s = '';
     this.setData({
       isFormOpen: false,
@@ -279,6 +324,9 @@ Page({
           selectedDays: app.globalData.selectedDays,
         }
       })
+
+      app.globalData.selectedDays = [];
+      app.globalData.selectedDaysSize = 0;
       // console.log("taskKeyList: " + s3);
     }
     else {
@@ -357,13 +405,17 @@ Page({
   getToTask: function (key) {
     var taskKeyString = key + '';
     var task = wx.getStorageSync(taskKeyString);
+    var days = [];
+    for (var i = 0; i < task.selectedDays.length; i++) {
+      days[i] = task.selectedDays[i].year + "/" + task.selectedDays[i].month + "/" + task.selectedDays[i].day;
+    }
     console.log(task);
     this.setData({
       tempTaskID: task.taskID,
       tempTaskName: task.taskName,
       tempTaskContent: task.content,
       tempUserName: task.userName,
-      tempSelectedDays: task.selectedDays,
+      tempSelectedDays: days,
       showModalStatus: true,
     })
   },
@@ -423,7 +475,7 @@ Page({
       );
     }
   },
-  modifyDayStates: function() {
+  modifyDayStates: function () {
     var that = this;
     var cur = this.data.currentDate;
     var s = that.data.currentDayStates;
@@ -437,12 +489,41 @@ Page({
       } else {
         cm = cur.substr(5, 2);
       }
-      if(m==cm){
+      if (m == cm) {
         s[selectedDay.key] = true;
       }
     }
     this.setData({
       currentDayStates: s,
+    })
+  },
+  modifyDayHaveTaskStates: function () {
+    var that = this;
+    var cur = this.data.currentDate;
+    var s = that.data.currentDayHaveTaskStates;
+    var s1 = that.data.taskKeyList;
+    for (var i = 1; i <= app.globalData.taskCount; i++) {
+      var taskKeyString = i + '';
+      var task = wx.getStorageSync(taskKeyString);
+      var days = task.selectedDays;
+      for (var j = 0; j < days.length; j++) {
+        var m = days[j].month;
+        // current month
+        var cm;
+        if (cur.substr(6, 1) == '月') {
+          cm = cur.substr(5, 1);
+        } else {
+          cm = cur.substr(5, 2);
+        }
+        if (m == cm) {
+          s[days[j].key] = true;
+          s1[days[j].key] = i;
+        }
+      }
+    }
+    this.setData({
+      currentDayHaveTaskStates: s,
+      taskKeyList: s1,
     })
   }
 })  

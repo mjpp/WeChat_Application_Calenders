@@ -4,6 +4,7 @@ const months = []
 const days = []
 const name = "gzy"
 const task = ''
+const openID = 'wx-kuo328738921173928273'
 
 for (let i = 1990; i <= date.getFullYear(); i++) {
   years.push(i)
@@ -22,8 +23,10 @@ Page({
   data: {
     // currentDate: "2017年05月03日",
     name: name,
-    userID: '',
+    userID: openID,
     userInfo: '',
+    hasUserInfo: false,
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
 
     currentDate: '',
     dayList: '',
@@ -49,11 +52,11 @@ Page({
     showModalStatus: false,
 
     // temp 
-    tempTaskID: '',
-    tempTaskName: '',
-    tempTaskContent: '',
-    tempUserName: '',
-    tempSelectedDays: '',
+    tempTaskID: [],
+    tempTaskName: [],
+    tempTaskContent: [],
+    tempUserName: [],
+    tempSelectedDays: [],
 
     //
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
@@ -67,6 +70,7 @@ Page({
       currentObj: currentObj
     })
     this.setSchedule(currentObj)
+    this.setUserInfo()
   },
   doDay: function (e) {
     var that = this
@@ -174,6 +178,7 @@ Page({
     var key = e.currentTarget.id;
     var s3 = that.data.currentDayHaveTaskStates;
     var s4 = that.data.taskKeyList;
+    var s5 = that.data.taskKeyListSize;
 
     if (this.data.isFormOpen) {
       // toggle green
@@ -266,7 +271,7 @@ Page({
 
     } else if (s3[key]) {
       // yellow, if click on the day have tasks, show the tasks
-      this.getToTask(s4[key]);
+      this.getToTask(s4[key], s5[key]);
     }
 
   },
@@ -416,23 +421,44 @@ Page({
       })
     }
   },
-  getToTask: function (keyList) {
+  getToTask: function (keyList, keyListSize) {
+    var that = this;
+    var s1 = [];
+    var s2 = [];
+    var s3 = [];
+    var s4 = [];
+    var s5 = [];
+
+    var index = 0;
+    for (; index < keyListSize; index++) {
+      var key = keyList[index];
+      var taskKeyString = key + '';
+      var task = wx.getStorageSync(taskKeyString);
+      var days = [];
+      for (var i = 0; i < task.selectedDays.length; i++) {
+        days[i] = task.selectedDays[i].year + "/" + task.selectedDays[i].month + "/" + task.selectedDays[i].day;
+      }
+      s1[index] = task.taskID;
+      s2[index] = task.taskName;
+      s3[index] = task.content;
+      s4[index] = task.userName;
+      s5[index] = days;
+    }
     // var taskKeyString = key + '';
     // var task = wx.getStorageSync(taskKeyString);
     // var days = [];
     // for (var i = 0; i < task.selectedDays.length; i++) {
-    //   days[i] = task.selectedDays[i].year + "/" + task.selectedDays[i].month + "/" + task.selectedDays[i].day;
+    // days[i] = task.selectedDays[i].year + "/" + task.selectedDays[i].month + "/" + task.selectedDays[i].day;
     // }
     // console.log(task);
-    // this.setData({
-    //   tempTaskID: task.taskID,
-    //   tempTaskName: task.taskName,
-    //   tempTaskContent: task.content,
-    //   tempUserName: task.userName,
-    //   tempSelectedDays: days,
-    //   showModalStatus: true,
-    // })
-    console.log(keyList);
+    this.setData({
+      tempTaskID: s1,
+      tempTaskName: s2,
+      tempTaskContent: s3,
+      tempUserName: s4,
+      tempSelectedDays: s5,
+      showModalStatus: true,
+    })
   },
   closeTask: function () {
     this.setData({
@@ -512,5 +538,44 @@ Page({
     })
     this.modifyDayHaveTaskStates();
     // console.log(this.data.currentDayHaveTaskStates);
+  },
+  setUserInfo: function() {
+    if (app.globalData.userInfo) {
+      this.setData({
+        userInfo: app.globalData.userInfo,
+        hasUserInfo: true
+      })
+    } else if (this.data.canIUse) {
+      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+      // 所以此处加入 callback 以防止这种情况
+      app.userInfoReadyCallback = res => {
+        this.setData({
+          userInfo: res.userInfo,
+          hasUserInfo: true
+        })
+      }
+    } else {
+      // 在没有 open-type=getUserInfo 版本的兼容处理
+      wx.getUserInfo({
+        success: res => {
+          app.globalData.userInfo = res.userInfo
+          this.setData({
+            userInfo: res.userInfo,
+            hasUserInfo: true
+          })
+        }
+      })
+    }
+  },
+  getUserInfo: function (e) {
+    app.globalData.userInfo = e.detail.userInfo
+    this.setData({
+      userInfo: e.detail.userInfo,
+      name: e.detail.userInfo.nickName,
+      hasUserInfo: true
+    })
+    console.log("已獲得使用者數據: ");
+    console.log(this.data);
+    console.log("進入小程序");    
   }
 })  

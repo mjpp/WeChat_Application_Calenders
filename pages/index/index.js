@@ -23,6 +23,7 @@ Page({
     // currentDate: "2017年05月03日",
     name: name,
     userID: '',
+    userInfo: '',
 
     currentDate: '',
     dayList: '',
@@ -52,7 +53,10 @@ Page({
     tempTaskName: '',
     tempTaskContent: '',
     tempUserName: '',
-    tempSelectedDays: ','
+    tempSelectedDays: '',
+
+    //
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
   },
   onLoad: function (options) {
     var currentObj = this.getCurrentDayString()
@@ -63,7 +67,6 @@ Page({
       currentObj: currentObj
     })
     this.setSchedule(currentObj)
-    this.getThisUserInfo()
   },
   doDay: function (e) {
     var that = this
@@ -222,7 +225,7 @@ Page({
           day: day,
           key: key,
         };
-        console.log(app.globalData.selectedDays);
+        // console.log(app.globalData.selectedDays);
       } else {
         // delete
         // 1. become black
@@ -275,8 +278,6 @@ Page({
     var s1 = that.data.currentDayHaveTaskStates;
     var s2 = that.data.currentDayStates;
     var s3 = that.data.taskKeyList;
-    console.log("@");
-    console.log(s3);
     var s4 = that.data.taskKeyListSize;
     var j = 0;
     var empty;
@@ -510,17 +511,6 @@ Page({
       showModalStatus: false,
     })
     this.modifyDayHaveTaskStates();
-    console.log(this.data.currentDayHaveTaskStates);
-  },
-  getThisUserInfo: function(){
-    wx.getUserInfo({
-      withCredentials: true,
-      lang: '',
-      success: function (res) {
-        console.log(res);
-       },
-      fail: function (res) { },
-      complete: function (res) { },
-    })
+    // console.log(this.data.currentDayHaveTaskStates);
   }
 })  

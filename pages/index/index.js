@@ -57,11 +57,14 @@ Page({
     tempTaskContent: [],
     tempUserName: [],
     tempSelectedDays: [],
+    isTempGroup: false,
 
     //
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
   },
   onLoad: function (options) {
+    // console.log(options)
+    this.getInviteCode(options)
     var currentObj = this.getCurrentDayString()
     // You grab the object of date and use it to set currentDate/currentDay/currentObj
     this.setData({
@@ -71,6 +74,30 @@ Page({
     })
     this.setSchedule(currentObj)
     this.setUserInfo()
+  },
+  onShareAppMessage: function (res) {
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      console.log(res.target)
+    }
+    return {
+      title: '自定义转发标题',
+      path: '/pages/index/index?uname='+ this.data.userInfo.nickName,
+    }
+  },
+  getInviteCode: function (options) {
+    if (options.uname != undefined) {
+      wx.showToast({
+        title: options.uname + '的分享',
+        icon: 'success',
+        duration: 2000
+      })
+    } else {
+      wx.showToast({
+        title: 'fail',
+        duration: 2000
+      })
+    }
   },
   doDay: function (e) {
     var that = this
@@ -463,6 +490,7 @@ Page({
   closeTask: function () {
     this.setData({
       showModalStatus: false,
+      isTempGroup: false,
     })
   },
   modifyDayStates: function () {
@@ -577,5 +605,16 @@ Page({
     console.log("已獲得使用者數據: ");
     console.log(this.data);
     console.log("進入小程序");    
+  },
+  groupSwitchClick: function(e) {
+    console.log(e.detail.value);
+    this.setData({
+      isTempGroup: e.detail.value,
+    })
+    if (this.data.isTempGroup){
+      // open the sharing function
+    } else {
+      // close the sharing function if it's opened
+    }
   }
 })  

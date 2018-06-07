@@ -1,4 +1,4 @@
- <button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 進入小程序 </button>
+<button wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 進入小程序 </button>
  
 <view class="page" wx:if="{{hasUserInfo}}">
   <scroll-view scroll-y="true" style="height: 50%;" class="drawer_box" wx:if="{{showModalStatus}}">
@@ -26,6 +26,8 @@
           <input class="input_base input_h30 col-1" name="bz"></input>
         </view> 
       </view>
+        <view class="section__title">是否與他人共享</view>
+        <switch name="是否與他人共享"  bindchange="groupSwitchClick"/>
       <button type="warn" bindtap="setTaskComplete">將此任務設置成已完成</button>
     </view>
     <button type="default" bindtap="closeTask">關閉</button>
@@ -43,7 +45,7 @@
         <view class="item-content transparent"></view>
       </view>
       <view class="flex-item">
-        <button type="default" bindtap="getTasksInfo">getTasksInfo</button>
+        <button type="warn" bindtap="getTasksInfo">getTasksInfo</button>
       </view>
       <view class="flex-item">
         <button type="primary" bindtap="closeAddingTask" wx:if="{{isFormOpen}}"> Close task </button>
@@ -119,7 +121,7 @@
 
 
       <view class="section section_gap">
-        <view class="section__title">Group Task</view>
+        <view class="section__title">是否與他人共享</view>
         <switch name="switch" />
       </view>
       <view class="section section_gap">

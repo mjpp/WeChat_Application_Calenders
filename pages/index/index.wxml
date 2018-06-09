@@ -15,7 +15,7 @@
       </view>
       <view class="top grid">
         <label class="title col-0">內容</label>
-        <view class="input_base input_h30 col-1" name="mobile" value="110">{{receiveTask.taskName || "no content"}}</view>
+        <view class="input_base input_h30 col-1" name="mobile" value="110">{{receiveTask.content || "no content"}}</view>
       </view>
       <view class="top grid">
         <label class="title col-0">日期</label>
@@ -25,8 +25,17 @@
           </text>
         </view>
       </view>
+      <view class="top grid" wx:if="{{showCompleteWarning}}">
+        <label class="title col-0">注意</label>
+        <view class="input_base input_h30 col-1" name="rName">{{receiveTask.taskName}}已被完成，如果接收该消息，{{receiveTask.taskName}}将被消除</view>
+      </view>
+      <view class="top grid" wx:if="{{showProcessingWarning}}">
+        <label class="title col-0">注意</label>
+        <view class="input_base input_h30 col-1" name="rName">{{receiveTask.userName}}向你分享了{{receiveTask.taskName}}，如果接收该消息，{{receiveTask.taskName}}将被加入日程</view>
+      </view>
     </view>
-    <button type="default" bindtap="closeReceiveTask">關閉</button>
+    <button type="default" bindtap="acceptReceiveTask">接受</button>
+    <button type="warn" bindtap="rejectReceiveTask">拒絕</button>
   </scroll-view>
 
   <!-- TASK-LIST FOR CERTAIN DATE -->
@@ -34,55 +43,45 @@
     <view wx:for="{{tempTaskID}}" wx:for-index='key' wx:key="{{key}}">
       <view class="drawer_title">{{tempTaskID[key]}}</view>
       <view class="drawer_content">
-        <view class="top grid">
-          <label class="title col-0">标题</label>
-          <view class="input_base input_h30 col-1" name="rName" value="可自行定义内容">{{tempTaskName[key] || "no title"}}</view>
-        </view>
-        <view class="top grid">
-          <label class="title col-0">內容</label>
-          <view class="input_base input_h30 col-1" name="mobile" value="110">{{tempTaskContent[key] || "no content"}}</view>
-        </view>
-        <view class="top grid">
-          <label class="title col-0">用戶名</label>
-          <view class="input_base input_h30 col-1" name="phone" value="拒绝伸手党">{{tempUserName[key] }}</view>
-        </view>
-        <view class="top grid">
-          <label class="title col-0">日期</label>
-          <view class="input_base input_h30 col-1" name="Email" value="仅供学习使用">{{tempSelectedDays[key]}}</view>
-        </view>
+        <form bindsubmit="formSubmit" bindreset="formReset">
+          <view class="top grid">
+            <label class="title col-0">用戶名</label>
+            <view class="input_base input_h30 col-1" name="tempUserName" value="{{tempUserName[key]}}">{{tempUserName[key]}}</view>
+          </view>
+          <view class="top grid">
+            <label class="title col-0">标题</label>
+            <input class="input_base input_h30 col-1" name="tempTaskName" value="{{tempTaskName[key]}}">{{tempTaskName[key] || "no title"}}</input>
+          </view>
+          <view class="top grid">
+            <label class="title col-0">內容</label>
+            <input class="input_base input_h30 col-1" name="tempTaskContent" value="{{tempTaskContent[key]}}">{{tempTaskContent[key] || "no content"}}</input>
+          </view>
+          <view class="top grid">
+            <label class="title col-0">日期</label>
+            <view class="input_base input_h30 col-1" name="tempSelectedDays">{{tempSelectedDays[key]}}</view>
+          </view>
+          <button type="primary" formType="submit" id="{{key}}" data-submittype='save'>保存</button>
+        </form>
       </view>
-      <view class="section__title">是否與他人共享</view>
-      <form bindreset="formReset">
-        <switch name="是否與他人共享" bindchange="groupSwitchClick" value="{{isTempGroup}}" />
-        <view style="height: 50%;" wx:if="{{showShareMessage}}">
-          <view class="section__title">是否确认與他人共享</view>
-          <button type="primary" formType="reset" open-type="share" id="{{key}}">确定</button>
-          <button type="default" formType="reset" bindtap="closeShareMsg">取消</button>
-        </view>
-      </form>
-      <button type="warn" bindtap="setTaskComplete" id="{{key}}">將此任務設置成已完成</button>
+      <button type="primary" open-type="share" id="{{key}}">與其他用戶分享此任務</button>
+      <button type="warn" open-type="share" bindtap="setTaskComplete" data-sharetype='complete' id="{{key}}">將此任務設置成已完成并分享</button>
+      <button type="warn" bindtap="setTaskComplete" value="{{tempTaskID[key]}}">將此任務設置成已完成</button>
     </view>
     <button type="default" bindtap="closeTask">關閉</button>
   </scroll-view>
-
-  <!-- Users Information For 
-  debug purpose -->
-  <text>{{userInfo.nickName}} / </text>
-  <text>{{userID}}</text>
-
 
   <view class="box">
 
     <!-- TOP-ROW BUTTONS -->
     <view class="box-flex">
       <view class="flex-item">
-        <!-- <view class="item-content transparent"></view> -->
-        <button type="default" open-type="share">share</button>
+        <view class="item-content transparent"></view>
       </view>
       <!-- DEBUG BUTTON -->
       <!-- it shows the tasks stored in the local repository -->
       <view class="flex-item">
-        <button type="warn" bindtap="getTasksInfo">getTasksInfo</button>
+        <view class="item-content transparent"></view>
+        <!-- <button type="warn" bindtap="getTasksInfo">getTasksInfo</button> -->
       </view>
       <view class="flex-item">
         <button type="primary" bindtap="closeAddingTask" wx:if="{{isFormOpen}}"> Close task </button>
@@ -158,13 +157,19 @@
       <view class="section section_gap">
         <view class="section__title">Importance</view>
         <slider name="slider" show-value block-size="20"></slider>
-      </view> 
+      </view>
       <view class="section section_gap">
         <view class="section__title">Importance</view>
         <radio-group name="radio-group">
-          <label>低<radio value="1" /></label>
-          <label>中<radio value="2" /></label>
-          <label>高<radio value="3" /></label>
+          <label>低
+            <radio value="1" />
+          </label>
+          <label>中
+            <radio value="2" />
+          </label>
+          <label>高
+            <radio value="3" />
+          </label>
         </radio-group>
       </view>
       <view class="section">

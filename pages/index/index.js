@@ -61,6 +61,8 @@ Page({
     receiveTask: '',
 
     showReceiveTask: false,
+    showCompleteWarning: false,
+    showProcessingWarning: false,
   },
   onLoad: function (options) {
     // parse and store the data sent by the sharer
@@ -85,7 +87,12 @@ Page({
     var myDate = new Date();
     var time = myDate.getTime(); //获取当前时间(从1970.1.1开始的毫秒数)
     groupID = this.data.userInfo.nickName + time + '';
-    var temp = Object.assign({}, task)
+    var temp = Object.assign({}, task);
+    console.log(res);
+    if (res.target.dataset.sharetype == "complete") {
+      temp.status = "completed";
+      wx.setStorageSync(taskKeyString, temp);
+    }
     if (temp.groupID == "") {
       temp.groupID = groupID;
       wx.setStorageSync(taskKeyString, temp);
@@ -130,9 +137,8 @@ Page({
         duration: 2000
       })
     }
-    if(this.data.receiveTask!=''){
+    if (this.data.receiveTask != '') {
       this.showReceiveTask();
-      this.modifyAndStoreReceiveTask();
     }
   },
   doDay: function (e) {
@@ -311,87 +317,103 @@ Page({
 
   },
   formSubmit: function (e) {
-    if (e.detail.value.input == "") {
-      wx.showToast({
-        title: '請填寫任務名',
-        icon: 'none',
-        duration: 2000
-      })
-    } else {
-      console.log('form发生了submit事件，携带数据为：', e.detail.value);
-      var taskKey = ++app.globalData.taskCount;
-      var that = this;
-      var s = that.data.selectedDays;
-      var s1 = that.data.currentDayHaveTaskStates;
-      var s2 = that.data.currentDayStates;
-      var s3 = that.data.taskKeyList;
-      var s4 = that.data.taskKeyListSize;
-      var j = 0;
-      var empty;
-      // var taskArray = []
-      if (s.length == 0) {
-        empty = true;
-      } else {
-        empty = false;
-      }
-      for (var i = 0; i < s2.length; i++) {
-        s2[i] = false;
-      }
-      var that = this;
-      var cur = this.data.currentDate;
-
-      for (var i = 0; i < app.globalData.selectedDaysSize; i++) {
-        let selectedDay = app.globalData.selectedDays[i];
-        var m = selectedDay.month;
-        // current month
-        var cm
-        if (cur.substr(6, 1) == '月') {
-          cm = cur.substr(5, 1);
-        } else {
-          cm = cur.substr(5, 2);
-        }
-        if (m == cm) {
-          s1[selectedDay.key] = true;
-          s3[selectedDay.key][s4[selectedDay.key]] = taskKey;
-          s4[selectedDay.key]++;
-        }
-      }
-
-      s = '';
+    if (e.detail.target.dataset.submittype == 'save') {
+      var key = e.detail.target.id;
+      var taskKey = this.data.tempTaskID[key];
+      var taskKeyString = taskKey + '';
+      var task = wx.getStorageSync(taskKeyString);
+      var temp = Object.assign({}, task);
+      temp.taskName = e.detail.value.tempTaskName;
+      temp.content = e.detail.value.tempTaskContent;   
+      wx.setStorageSync(taskKeyString, temp);
       this.setData({
-        isFormOpen: false,
-        selectedDays: s,
-        currentDayHaveTaskStates: s1,
-        currentDayStates: s2,
-        taskKeyList: s3,
-        taskKeyListSize: s4,
+        showModalStatus: false,
       })
-      if (!empty) {
-        // data storage
-        var taskKeyString = taskKey + '';
-        wx.setStorage({
-          key: taskKeyString,
-          data: {
-            taskID: taskKeyString,
-            userID: '',
-            groupID: '',
-            isGroupTask: e.detail.value.switch,
-            importance: e.detail.value.slider,
-            taskName: e.detail.value.input,
-            content: e.detail.value.textarea,
-            userName: name,
-            selectedDays: app.globalData.selectedDays,
-            status: 'processing',
-          }
-        })
 
-        app.globalData.selectedDays = [];
-        app.globalData.selectedDaysSize = 0;
-      }
-      else {
-        app.globalData.taskCount--;
+    } else {
+      if (e.detail.value.input == "") {
+        wx.showToast({
+          title: '請填寫任務名',
+          icon: 'none',
+          duration: 2000
+        })
+      } else {
+        console.log('form发生了submit事件，携带数据为：', e.detail.value);
+        var taskKey = ++app.globalData.taskCount;
+        var that = this;
+        var s = that.data.selectedDays;
+        var s1 = that.data.currentDayHaveTaskStates;
+        var s2 = that.data.currentDayStates;
+        var s3 = that.data.taskKeyList;
+        var s4 = that.data.taskKeyListSize;
+        var j = 0;
+        var empty;
+        // var taskArray = []
+        if (s.length == 0) {
+          empty = true;
+        } else {
+          empty = false;
+        }
+        for (var i = 0; i < s2.length; i++) {
+          s2[i] = false;
+        }
+        var that = this;
+        var cur = this.data.currentDate;
+
+        for (var i = 0; i < app.globalData.selectedDaysSize; i++) {
+          let selectedDay = app.globalData.selectedDays[i];
+          var m = selectedDay.month;
+          // current month
+          var cm
+          if (cur.substr(6, 1) == '月') {
+            cm = cur.substr(5, 1);
+          } else {
+            cm = cur.substr(5, 2);
+          }
+          if (m == cm) {
+            s1[selectedDay.key] = true;
+            s3[selectedDay.key][s4[selectedDay.key]] = taskKey;
+            s4[selectedDay.key]++;
+          }
+        }
+
+        s = '';
+        this.setData({
+          isFormOpen: false,
+          selectedDays: s,
+          currentDayHaveTaskStates: s1,
+          currentDayStates: s2,
+          taskKeyList: s3,
+          taskKeyListSize: s4,
+        })
+        if (!empty) {
+          // data storage
+          var taskKeyString = taskKey + '';
+          wx.setStorage({
+            key: taskKeyString,
+            data: {
+              taskID: taskKeyString,
+              userID: '',
+              groupID: '',
+              isGroupTask: e.detail.value.switch,
+              importance: e.detail.value.slider,
+              taskName: e.detail.value.input,
+              content: e.detail.value.textarea,
+              userName: this.data.userInfo.nickName,
+              selectedDays: app.globalData.selectedDays,
+              status: 'processing',
+            }
+          })
+
+          app.globalData.selectedDays = [];
+          app.globalData.selectedDaysSize = 0;
+        }
+        else {
+          app.globalData.taskCount--;
+        }
       }
     }
+
 
   },
   formReset: function () {
@@ -633,31 +655,19 @@ Page({
       isTempGroup: false,
     })
   },
-  share: function (e) {
-    var id = e.currentTarget.id;
-    var taskKey = this.data.tempTaskID[id];
-    var taskKeyString = taskKey + '';
-    var task = wx.getStorageSync(taskKeyString);
-    var groupID = '';
-    var myDate = new Date();
-    var time = myDate.getTime(); //获取当前时间(从1970.1.1开始的毫秒数)
-    groupID = this.data.userInfo.nickName + time + '';
-    var temp = Object.assign({}, task)
-    if (temp.groupID == "") {
-      console.log('a');
-      temp.groupID = groupID;
-      wx.setStorageSync(taskKeyString, temp);
-    }
-    this.setData({
-      sendTask: temp,
-      showShareMessage: false,
-      isTempGroup: true,
-    })
-  },
   showReceiveTask: function () {
     if (this.data.receiveTask != '') {
-      console.log("receiveTask:");
-      console.log(this.data.receiveTask);
+      if (this.data.receiveTask.status == "completed") {
+        this.setData({
+          showCompleteWarning: true,
+          showProcessingWarning: false
+        })
+      } else if (this.data.receiveTask.status == "processing") {
+        this.setData({
+          showCompleteWarning: false,
+          showProcessingWarning: true,
+        })
+      }
       this.setData({
         showReceiveTask: true
       })
@@ -731,7 +741,7 @@ Page({
           importance: receiveTask.importance,
           taskName: receiveTask.taskName,
           content: receiveTask.content,
-          userName: '',
+          userName: this.data.userInfo.nickName,
           selectedDays: receiveTask.selectedDays,
           status: receiveTask.status,
         }
@@ -769,6 +779,17 @@ Page({
     }
   },
   closeReceiveTask: function () {
+    this.setData({
+      showReceiveTask: false,
+    })
+  },
+  acceptReceiveTask: function () {
+    this.modifyAndStoreReceiveTask();
+    this.setData({
+      showReceiveTask: false,
+    })
+  },
+  rejectReceiveTask: function () {
     this.setData({
       showReceiveTask: false,
     })

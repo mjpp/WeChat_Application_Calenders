@@ -6,6 +6,29 @@
 <!-- CALENDER -->
 <view class="page" wx:if="{{hasUserInfo}}">
 
+  <!-- SHOW RECEIVE TASK -->
+  <scroll-view scroll-y="true" style="height: 50%;" class="drawer_box" wx:if="{{showReceiveTask}}">
+    <view class="drawer_content">
+      <view class="top grid">
+        <label class="title col-0">标题</label>
+        <view class="input_base input_h30 col-1" name="rName">{{receiveTask.taskName || "no title"}}</view>
+      </view>
+      <view class="top grid">
+        <label class="title col-0">內容</label>
+        <view class="input_base input_h30 col-1" name="mobile" value="110">{{receiveTask.taskName || "no content"}}</view>
+      </view>
+      <view class="top grid">
+        <label class="title col-0">日期</label>
+        <view class="input_base input_h30 col-1" name="Email" value="仅供学习使用">
+          <text wx:for="{{receiveTask.selectedDays}}" wx:for-index='key' wx:key="{{key}}">
+          <text>{{receiveTask.selectedDays[key].year}}/{{receiveTask.selectedDays[key].month}}/{{receiveTask.selectedDays[key].day}} </text>
+          </text>
+        </view>
+      </view>
+    </view>
+    <button type="default" bindtap="closeReceiveTask">關閉</button>
+  </scroll-view>
+
   <!-- TASK-LIST FOR CERTAIN DATE -->
   <scroll-view scroll-y="true" style="height: 50%;" class="drawer_box" wx:if="{{showModalStatus}}">
     <view wx:for="{{tempTaskID}}" wx:for-index='key' wx:key="{{key}}">
@@ -27,10 +50,6 @@
           <label class="title col-0">日期</label>
           <view class="input_base input_h30 col-1" name="Email" value="仅供学习使用">{{tempSelectedDays[key]}}</view>
         </view>
-        <view class="top bottom grid">
-          <label class="title col-0">备注</label>
-          <input class="input_base input_h30 col-1" name="bz"></input>
-        </view>
       </view>
       <view class="section__title">是否與他人共享</view>
       <form bindreset="formReset">
@@ -50,6 +69,7 @@
   debug purpose -->
   <text>{{userInfo.nickName}} / </text>
   <text>{{userID}}</text>
+
 
   <view class="box">
 
@@ -131,13 +151,21 @@
         <text  wx:if="{{item != null}}">{{item}}
         </text>
       </text>
-      <view class="section section_gap">
+      <!-- <view class="section section_gap">
         <view class="section__title">是否與他人共享</view>
         <switch name="switch" />
-      </view>
+      </view> -->
       <view class="section section_gap">
         <view class="section__title">Importance</view>
-        <slider name="slider" show-value></slider>
+        <slider name="slider" show-value block-size="20"></slider>
+      </view> 
+      <view class="section section_gap">
+        <view class="section__title">Importance</view>
+        <radio-group name="radio-group">
+          <label>低<radio value="1" /></label>
+          <label>中<radio value="2" /></label>
+          <label>高<radio value="3" /></label>
+        </radio-group>
       </view>
       <view class="section">
         <view class="section__title">Task name</view>
@@ -153,6 +181,5 @@
         <button type="warn" bindtap="closeAddingTask">Cancel adding task</button>
       </view>
     </form>
-
   </view>
 </view>

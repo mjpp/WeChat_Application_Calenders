@@ -33,22 +33,31 @@
         </view>
       </view>
       <view class="section__title">是否與他人共享</view>
-      <switch name="是否與他人共享" bindchange="groupSwitchClick" />
+      <form bindreset="formReset">
+        <switch name="是否與他人共享" bindchange="groupSwitchClick" value="{{isTempGroup}}" />
+        <view style="height: 50%;" wx:if="{{showShareMessage}}">
+          <view class="section__title">是否确认與他人共享</view>
+          <button type="primary" formType="reset" open-type="share" id="{{key}}">确定</button>
+          <button type="default" formType="reset" bindtap="closeShareMsg">取消</button>
+        </view>
+      </form>
       <button type="warn" bindtap="setTaskComplete" id="{{key}}">將此任務設置成已完成</button>
     </view>
     <button type="default" bindtap="closeTask">關閉</button>
   </scroll-view>
 
-  <!-- Users Information For debug purpose -->
+  <!-- Users Information For 
+  debug purpose -->
   <text>{{userInfo.nickName}} / </text>
   <text>{{userID}}</text>
 
   <view class="box">
 
-     <!-- TOP-ROW BUTTONS -->
+    <!-- TOP-ROW BUTTONS -->
     <view class="box-flex">
       <view class="flex-item">
-        <view class="item-content transparent"></view>
+        <!-- <view class="item-content transparent"></view> -->
+        <button type="default" open-type="share">share</button>
       </view>
       <!-- DEBUG BUTTON -->
       <!-- it shows the tasks stored in the local repository -->

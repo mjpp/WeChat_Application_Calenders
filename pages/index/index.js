@@ -56,7 +56,9 @@ Page({
     tempUserName: [],
     tempSelectedDays: [],
     isTempGroup: false,
-
+    showShareMessage: false,
+    sentTask: '',
+    receiveTask: '',
   },
   onLoad: function (options) {
     // parse and store the data sent by the sharer
@@ -70,19 +72,42 @@ Page({
     })
     this.setSchedule(currentObj)
     this.setUserInfo()
+    wx.hideShareMenu();
   },
   onShareAppMessage: function (res) {
+    console.log(res);
+    var id = res.target.id;
+    var taskKey = this.data.tempTaskID[id];
+    var taskKeyString = taskKey + '';
+    var task = wx.getStorageSync(taskKeyString);
+    var groupID = '';
+    var myDate = new Date();
+    var time = myDate.getTime(); //获取当前时间(从1970.1.1开始的毫秒数)
+    groupID = this.data.userInfo.nickName + time + '';
+    var temp = Object.assign({}, task)
+    if (temp.groupID == "") {
+      console.log('a');
+      temp.groupID = groupID;
+      wx.setStorageSync(taskKeyString, temp);
+    }
+    this.setData({
+      sendTask: temp,
+      showShareMessage: false,
+      isTempGroup: true,
+    })
+    console.log(this.data.sendTask);
     if (res.from === 'button') {
       // 来自页面内转发按钮
-      console.log(res.target)
+      // console.log(res.target)
     }
+    var title = this.data.userInfo.nickName + "向您分享了一個任務"; // 在加上任務名子
     return {
       title: '自定义转发标题',
-      path: '/pages/index/index?uinfo=' + JSON.stringify(this.data.userInfo) + "&uname=" + this.data.userInfo.nickName,
+      path: '/pages/index/index?sendTask=' + JSON.stringify(this.data.sendTask) + "&uname=" + this.data.userInfo.nickName,
       success: function (res) {
         // 转发成功
         wx.showToast({
-          title:'转发成功',
+          title: '转发成功',
           icon: 'success',
           duration: 2000
         })
@@ -90,19 +115,23 @@ Page({
     }
   },
   getInviteCode: function (options) {
-    if (options.uinfo != undefined) {
+    if (options.sendTask != undefined) {
       wx.showToast({
-        title: options.uname + '的分享',
+        title: options.uname + "/" + options.sendTask.taskName,
         icon: 'success',
         duration: 2000
       })
-    } else {
+      this.setData({
+        receiveTask: options.sendTask,
+      })
+    }  else {
       wx.showToast({
-        title: 'fail',
+        title: 'fail to receive the task',
         duration: 2000
       })
     }
-    console.log(options.uinfo);
+    console.log(this.data.receiveTask);
+    
   },
   doDay: function (e) {
     var that = this
@@ -152,7 +181,7 @@ Page({
     }
   },
   setSchedule: function (currentObj) {
-    var that = this                   
+    var that = this
     // The below 5 lines gets the number of days in the current months by a tricky way.
     // 1. Increase month by 1. 2. set the date to be 0 
     // => Become the last day of the current month, and it implies the number of days in the current month.
@@ -280,79 +309,88 @@ Page({
 
   },
   formSubmit: function (e) {
-    console.log('form发生了submit事件，携带数据为：', e.detail.value);
-    var taskKey = ++app.globalData.taskCount;
-    var that = this;
-    var s = that.data.selectedDays;
-    var s1 = that.data.currentDayHaveTaskStates;
-    var s2 = that.data.currentDayStates;
-    var s3 = that.data.taskKeyList;
-    var s4 = that.data.taskKeyListSize;
-    var j = 0;
-    var empty;
-    // var taskArray = []
-    if (s.length == 0) {
-      empty = true;
-    } else {
-      empty = false;
-    }
-    for (var i = 0; i < s2.length; i++) {
-      s2[i] = false;
-    }
-    var that = this;
-    var cur = this.data.currentDate;
-
-    for (var i = 0; i < app.globalData.selectedDaysSize; i++) {
-      let selectedDay = app.globalData.selectedDays[i];
-      var m = selectedDay.month;
-      // current month
-      var cm
-      if (cur.substr(6, 1) == '月') {
-        cm = cur.substr(5, 1);
-      } else {
-        cm = cur.substr(5, 2);
-      }
-      if (m == cm) {
-        s1[selectedDay.key] = true;
-        s3[selectedDay.key][s4[selectedDay.key]] = taskKey;
-        s4[selectedDay.key]++;
-      }
-    }
-
-    s = '';
-    this.setData({
-      isFormOpen: false,
-      selectedDays: s,
-      currentDayHaveTaskStates: s1,
-      currentDayStates: s2,
-      taskKeyList: s3,
-      taskKeyListSize: s4,
-    })
-    if (!empty) {
-      // data storage
-      var taskKeyString = taskKey + '';
-      wx.setStorage({
-        key: taskKeyString,
-        data: {
-          taskID: taskKeyString,
-          userID: '',
-          groupID: '',
-          isGroupTask: e.detail.value.switch,
-          importance: e.detail.value.slider,
-          taskName: e.detail.value.input,
-          content: e.detail.value.textarea,
-          userName: name,
-          selectedDays: app.globalData.selectedDays,
-          status: 'processing',
-        }
+    if (e.detail.value.input == "") {
+      wx.showToast({
+        title: '請填寫任務名',
+        icon: 'none',
+        duration: 2000
       })
+    } else {
+      console.log('form发生了submit事件，携带数据为：', e.detail.value);
+      var taskKey = ++app.globalData.taskCount;
+      var that = this;
+      var s = that.data.selectedDays;
+      var s1 = that.data.currentDayHaveTaskStates;
+      var s2 = that.data.currentDayStates;
+      var s3 = that.data.taskKeyList;
+      var s4 = that.data.taskKeyListSize;
+      var j = 0;
+      var empty;
+      // var taskArray = []
+      if (s.length == 0) {
+        empty = true;
+      } else {
+        empty = false;
+      }
+      for (var i = 0; i < s2.length; i++) {
+        s2[i] = false;
+      }
+      var that = this;
+      var cur = this.data.currentDate;
 
-      app.globalData.selectedDays = [];
-      app.globalData.selectedDaysSize = 0;
+      for (var i = 0; i < app.globalData.selectedDaysSize; i++) {
+        let selectedDay = app.globalData.selectedDays[i];
+        var m = selectedDay.month;
+        // current month
+        var cm
+        if (cur.substr(6, 1) == '月') {
+          cm = cur.substr(5, 1);
+        } else {
+          cm = cur.substr(5, 2);
+        }
+        if (m == cm) {
+          s1[selectedDay.key] = true;
+          s3[selectedDay.key][s4[selectedDay.key]] = taskKey;
+          s4[selectedDay.key]++;
+        }
+      }
+
+      s = '';
+      this.setData({
+        isFormOpen: false,
+        selectedDays: s,
+        currentDayHaveTaskStates: s1,
+        currentDayStates: s2,
+        taskKeyList: s3,
+        taskKeyListSize: s4,
+      })
+      if (!empty) {
+        // data storage
+        var taskKeyString = taskKey + '';
+        wx.setStorage({
+          key: taskKeyString,
+          data: {
+            taskID: taskKeyString,
+            userID: '',
+            groupID: '',
+            isGroupTask: e.detail.value.switch,
+            importance: e.detail.value.slider,
+            taskName: e.detail.value.input,
+            content: e.detail.value.textarea,
+            userName: name,
+            selectedDays: app.globalData.selectedDays,
+            status: 'processing',
+          }
+        })
+
+        app.globalData.selectedDays = [];
+        app.globalData.selectedDaysSize = 0;
+      }
+      else {
+        app.globalData.taskCount--;
+      }
     }
-    else {
-      app.globalData.taskCount--;
-    }
+
   },
   formReset: function () {
     console.log('form发生了reset事件');
@@ -575,16 +613,43 @@ Page({
     console.log("已獲得使用者數據: ");
     console.log(this.data);
     console.log("進入小程序");
-  },
-  groupSwitchClick: function (e) {
+  }, groupSwitchClick: function (e) {
     console.log(e.detail.value);
     this.setData({
       isTempGroup: e.detail.value,
+      showShareMessage: e.detail.value,
     })
     if (this.data.isTempGroup) {
       // open the sharing function
     } else {
       // close the sharing function if it's opened
     }
+  },
+  closeShareMsg: function () {
+    this.setData({
+      showShareMessage: false,
+      isTempGroup: false,
+    })
+  },
+  share: function (e) {
+    var id = e.currentTarget.id;
+    var taskKey = this.data.tempTaskID[id];
+    var taskKeyString = taskKey + '';
+    var task = wx.getStorageSync(taskKeyString);
+    var groupID = '';
+    var myDate = new Date();
+    var time = myDate.getTime(); //获取当前时间(从1970.1.1开始的毫秒数)
+    groupID = this.data.userInfo.nickName + time + '';
+    var temp = Object.assign({}, task)
+    if (temp.groupID == "") {
+      console.log('a');
+      temp.groupID = groupID;
+      wx.setStorageSync(taskKeyString, temp);
+    }
+    this.setData({
+      sendTask: temp,
+      showShareMessage: false,
+      isTempGroup: true,
+    })
   }
 })  

@@ -1,3 +1,4 @@
+
 const date = new Date()
 const years = []
 const months = []
@@ -9,11 +10,9 @@ const openID = 'wx-kuo328738921173928273'
 for (let i = 1990; i <= date.getFullYear(); i++) {
   years.push(i)
 }
-
 for (let i = 1; i <= 12; i++) {
   months.push(i)
 }
-
 for (let i = 1; i <= 31; i++) {
   days.push(i)
 }
@@ -21,7 +20,6 @@ for (let i = 1; i <= 31; i++) {
 var app = getApp();
 Page({
   data: {
-    // currentDate: "2017年05月03日",
     name: name,
     userID: openID,
     userInfo: '',
@@ -59,14 +57,12 @@ Page({
     tempSelectedDays: [],
     isTempGroup: false,
 
-    //
-    canIUse: wx.canIUse('button.open-type.getUserInfo'),
   },
   onLoad: function (options) {
-    // console.log(options)
+    // parse and store the data sent by the sharer
     this.getInviteCode(options)
+
     var currentObj = this.getCurrentDayString()
-    // You grab the object of date and use it to set currentDate/currentDay/currentObj
     this.setData({
       currentDate: currentObj.getFullYear() + '年' + (currentObj.getMonth() + 1) + '月' + currentObj.getDate() + '日',
       currentDay: currentObj.getDate(),
@@ -82,11 +78,19 @@ Page({
     }
     return {
       title: '自定义转发标题',
-      path: '/pages/index/index?uname=' + this.data.userInfo.nickName,
+      path: '/pages/index/index?uinfo=' + JSON.stringify(this.data.userInfo) + "&uname=" + this.data.userInfo.nickName,
+      success: function (res) {
+        // 转发成功
+        wx.showToast({
+          title:'转发成功',
+          icon: 'success',
+          duration: 2000
+        })
+      },
     }
   },
   getInviteCode: function (options) {
-    if (options.uname != undefined) {
+    if (options.uinfo != undefined) {
       wx.showToast({
         title: options.uname + '的分享',
         icon: 'success',
@@ -98,6 +102,7 @@ Page({
         duration: 2000
       })
     }
+    console.log(options.uinfo);
   },
   doDay: function (e) {
     var that = this
@@ -130,7 +135,6 @@ Page({
       b = false;
     }
     this.setData({
-      // currentDate: currentObj.getFullYear() + '年' + (currentObj.getMonth() + 1) + '月' + currentObj.getDate() + '日',
       currentDate: currentObj.getFullYear() + '年' + (currentObj.getMonth() + 1) + '月',
       currentObj: currentObj,
       isCurrentMonth: b
@@ -148,7 +152,7 @@ Page({
     }
   },
   setSchedule: function (currentObj) {
-    var that = this                     // that stores the initial this in order to avoid accidential modification of this
+    var that = this                   
     // The below 5 lines gets the number of days in the current months by a tricky way.
     // 1. Increase month by 1. 2. set the date to be 0 
     // => Become the last day of the current month, and it implies the number of days in the current month.
@@ -159,7 +163,7 @@ Page({
     var currentDayNum = new Date(Y, m, 0).getDate()
     var currentDayWeek = currentObj.getUTCDay() + 1   // 顯示星期幾
     var result = currentDayWeek - (d % 7 - 1);
-    var firstKey = result <= 0 ? 7 + result : result;  // 計算出一號應該是星期幾
+    var firstKey = result <= 0 ? 7 + result : result; // 計算出一號應該是星期幾
 
     var currentDayHaveTaskStates = []
     var currentDayList = []
@@ -167,7 +171,6 @@ Page({
     var taskKeyList = []
     var taskKeyListSize = []
     var f = 0
-    // why condition i < 42?
     // 最多42個
     // 將1 - # of month 寫入一個array並在array的前後適度地添加空格
     for (var i = 0; i < 42; i++) {
@@ -187,8 +190,6 @@ Page({
       taskKeyList[i] = [];
       taskKeyListSize[i] = 0;
     }
-
-    // console.log(taskKeyList);
     that.setData({
       currentDayList: currentDayList,
       currentDayStates: currentDayStates,
@@ -196,7 +197,6 @@ Page({
       taskKeyList: taskKeyList,
       taskKeyListSize: taskKeyListSize
     })
-
     this.modifyDayStates();
     this.modifyDayHaveTaskStates();
   },
@@ -208,28 +208,6 @@ Page({
     var s5 = that.data.taskKeyListSize;
 
     if (this.data.isFormOpen) {
-      // toggle green
-      // var s = that.data.currentDayStates
-      // s[key] = !s[key];
-      // this.setData({
-      //   currentDayStates: s
-      // })
-      // // travse currentDayStates and store selectedDays
-      // var s1 = that.data.currentDayList;
-      // var s2 = that.data.currentDayStates;
-      // var cur = that.data.currentDate;
-      // var results = [];
-      // for (var i = 0; i < s1.length; i++) {
-      //   if (s2[i]) {
-      //     results[i] = cur.substr(0, 7) + s1[i] + "日";
-      //     // console.log(cur.substr(0, 7) + s1[i] + "日");
-      //     app.globalData.selectedDays[app.globalData.selectedDays.length] = results[i];
-      //     console.log(app.globalData.selectedDays);
-      //   }
-      // }
-      // this.setData({
-      //   selectedDays: results
-      // })
       var s = that.data.currentDayStates
       var s1 = that.data.currentDayList;
       var cur = that.data.currentDate;
@@ -257,7 +235,6 @@ Page({
           day: day,
           key: key,
         };
-        // console.log(app.globalData.selectedDays);
       } else {
         // delete
         // 1. become black
@@ -354,7 +331,6 @@ Page({
     if (!empty) {
       // data storage
       var taskKeyString = taskKey + '';
-      // console.log(taskKeyString);
       wx.setStorage({
         key: taskKeyString,
         data: {
@@ -373,7 +349,6 @@ Page({
 
       app.globalData.selectedDays = [];
       app.globalData.selectedDaysSize = 0;
-      // console.log("taskKeyList: " + s3);
     }
     else {
       app.globalData.taskCount--;
@@ -405,21 +380,6 @@ Page({
         s[selectedDay.key] = false;
       }
     }
-    // this.setData({
-    //   currentDayStates: s,
-    // })
-    // var that = this;
-    // var s = that.data.selectedDays;
-    // var s2 = that.data.currentDayStates;
-    // // 同一個月
-    // // 用key
-    // // purpose toggle green
-    // for (var i = 0; i < s.length; i++) {
-    //   if (s[i] != null) {
-    //     s2[i] = false;
-    //   }
-    // // }
-    // s = '';
     app.globalData.selectedDays = [];
     app.globalData.selectedDaysSize = 0;
     this.setData({
@@ -471,13 +431,6 @@ Page({
       s4[index] = task.userName;
       s5[index] = days;
     }
-    // var taskKeyString = key + '';
-    // var task = wx.getStorageSync(taskKeyString);
-    // var days = [];
-    // for (var i = 0; i < task.selectedDays.length; i++) {
-    // days[i] = task.selectedDays[i].year + "/" + task.selectedDays[i].month + "/" + task.selectedDays[i].day;
-    // }
-    // console.log(task);
     this.setData({
       tempTaskID: s1,
       tempTaskName: s2,
@@ -575,8 +528,6 @@ Page({
       taskKeyList[i] = [];
       taskKeyListSize[i] = 0;
     }
-
-    // console.log(taskKeyList);
     that.setData({
       currentDayStates: currentDayStates,
       currentDayHaveTaskStates: currentDayHaveTaskStates,

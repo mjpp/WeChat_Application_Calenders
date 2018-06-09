@@ -793,5 +793,5 @@ Page({
     this.setData({
       showReceiveTask: false,
     })
-  }
+  },
 })  

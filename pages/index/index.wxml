@@ -73,35 +73,32 @@
   <view class="box">
 
     <!-- TOP-ROW BUTTONS -->
-    <view class="box-flex">
+    <!-- <view class="box-flex">
       <view class="flex-item">
-        <view class="item-content transparent"></view>
+        <button class="item-content"> </button>
       </view>
-      <!-- DEBUG BUTTON -->
-      <!-- it shows the tasks stored in the local repository -->
       <view class="flex-item">
-        <view class="item-content transparent"></view>
-        <!-- <button type="warn" bindtap="getTasksInfo">getTasksInfo</button> -->
+         <button type="warn" bindtap="getTasksInfo">getTasksInfo</button> 
       </view>
       <view class="flex-item">
         <button type="primary" bindtap="closeAddingTask" wx:if="{{isFormOpen}}"> Close task </button>
         <button type="primary" bindtap="startAddingTask" wx:else> Add task </button>
       </view>
-    </view>
+    </view> -->
 
     <!-- CHANGE-MONTH & CURRENT-DATE -->
     <view class="box-flex">
       <view class="flex-item">
         <view class="item-content" bindtap="doDay" data-key='left'>
-          <view class="glyphicon glyphicon-triangle-left"></view>
+          <view class="left-key glyphicon glyphicon-triangle-left"></view>
         </view>
       </view>
       <view class="flex-item item-content-current-day">
-        <view class="item-content">{{currentDate}}</view>
+        <view class="currentDate">{{currentDate}}</view>
       </view>
       <view class="flex-item">
         <view class="item-content" bindtap="doDay" data-key="right">
-          <view class="glyphicon glyphicon-triangle-right"></view>
+          <view class="right-key glyphicon glyphicon-triangle-right"></view>
         </view>
       </view>
     </view>
@@ -109,77 +106,94 @@
     <!-- WEEKDAY -->
     <view class="box-flex">
       <view class="flex-item">
-        <view class="item-content">一</view>
+        <view class="item-content">
+          <view class="weekday">一</view>
+        </view>
       </view>
       <view class="flex-item">
-        <view class="item-content">二</view>
+        <view class="item-content">
+          <view class="weekday">二</view>
+        </view>
       </view>
       <view class="flex-item">
-        <view class="item-content">三</view>
+        <view class="item-content">
+          <view class="weekday">三</view>
+        </view>
       </view>
       <view class="flex-item">
-        <view class="item-content">四</view>
+        <view class="item-content">
+          <view class="weekday">四</view>
+        </view>
       </view>
       <view class="flex-item">
-        <view class="item-content">五</view>
+        <view class="item-content">
+          <view class="weekday">五</view>
+        </view>
       </view>
       <view class="flex-item">
-        <view class="item-content">六</view>
+        <view class="item-content">
+          <view class="weekday">六</view>
+        </view>
       </view>
       <view class="flex-item">
-        <view class="item-content">日</view>
+        <view class="item-content">
+          <view class="weekday">日</view>
+        </view>
       </view>
     </view>
 
     <!-- DAYS -->
     <view class="box-flex">
       <view class="flex-item" wx:for="{{currentDayList}}" wx:for-index='key' wx:for-item="vo" wx:key="{{key}}" id="{{key}}" bindtap="onClick">
-        <view class="item-content" wx:if="{{(currentDay != vo || !isCurrentMonth) && !currentDayStates[key] && !currentDayHaveTaskStates[key] }}">{{vo}}</view>
+        <view class="item-content" wx:if="{{(currentDay != vo || !isCurrentMonth) && !currentDayStates[key] && !currentDayHaveTaskStates[key] && currentDayList[key]!=''}}">{{vo}}</view>
+        <view class="item-content not-this-month" wx:if="{{(currentDay != vo || !isCurrentMonth) && !currentDayStates[key] && !currentDayHaveTaskStates[key] && currentDayList[key]==''}}">x</view>
         <view class="item-content bk-color-day" wx:if="{{currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key]}}">{{vo}}</view>
         <view class="item-content select-color-day" wx:if="{{currentDayStates[key] && !currentDayHaveTaskStates[key]}}">{{vo}}</view>
-        <view class="item-content have-task" wx:if="{{currentDayHaveTaskStates[key] }}">{{vo}}</view>
+        <view class="item-content have-task" wx:if="{{currentDayHaveTaskStates[key]}}">{{vo}}</view>
+
       </view>
     </view>
 
+    <view>
+      <button class="add-button" bindtap="closeAddingTask" wx:if="{{isFormOpen}}">
+        <image class="add-button-img" src="./image/add-task.jpg" mode="aspectFit" />
+      </button>
+      <button class="add-button" bindtap="startAddingTask" wx:else>
+        <image class="add-button-img" src="./image/add-task.jpg" mode="aspectFit" />
+      </button>
+    </view>
+
+
     <!-- ADD-TASK FORM -->
     <form bindsubmit="formSubmit" bindreset="formReset" wx:if="{{isFormOpen}}">
-      <text>
-    Selected dates:
-    </text>
-      <text wx:for="{{selectedDays}}" wx:for-index='key' wx:for-item="item" wx:key="{{key}}" id="{{key}}"> 
-        <text  wx:if="{{item != null}}">{{item}}
+      <view class="task">
+        <image class="task-img" src="./image/task-1.jpg" mode="aspectFit" />
+      </view>
+      <view class="task-content" wx:for="{{selectedDays}}" wx:for-index='key' wx:for-item="item" wx:key="{{key}}" id="{{key}}">
+        <text class="task-content-day" wx:if="{{item != null}}">{{item}}
         </text>
-      </text>
-      <!-- <view class="section section_gap">
-        <view class="section__title">是否與他人共享</view>
-        <switch name="switch" />
-      </view> -->
-      <view class="section section_gap">
-        <view class="section__title">Importance</view>
+      </view>
+      <view class="task">
+        <image class="task-img" src="./image/task-2.jpg" mode="aspectFit" />
+      </view>
+      <view class="task-content">
+        <input name="input" placeholder="  输入任务标题" />
+      </view>
+      <view class="task">
+        <image class="task-img" src="./image/task-3.jpg" mode="aspectFit" />
+      </view>
+      <view class="task-content">
+        <textarea name="textarea"  
+        placeholder="一只船孤独地航行在大海上，它既不寻求幸福\n也不逃避幸福，它只是向前航行，\n底下是沉静碧蓝的大海，而头顶是金色的太阳，\n将要直面的，与已成过往的，\n较之深埋于它内心的皆为微沫。" />
+      </view>
+      <view class="task">
+        <image class="task-img" src="./image/task-4.jpg" mode="aspectFit" />
+      </view>
+      <view class="task-content" >
         <slider name="slider" show-value block-size="20"></slider>
       </view>
-      <view class="section section_gap">
-        <view class="section__title">Importance</view>
-        <radio-group name="radio-group">
-          <label>低
-            <radio value="1" />
-          </label>
-          <label>中
-            <radio value="2" />
-          </label>
-          <label>高
-            <radio value="3" />
-          </label>
-        </radio-group>
-      </view>
-      <view class="section">
-        <view class="section__title">Task name</view>
-        <input name="input" placeholder="please input here" />
-      </view>
-      <view class="section">
-        <view class="section__title">Task content</view>
-        <textarea placeholder="form 中的 textarea" name="textarea" />
-      </view>
+      
+      
       <view class="btn-area">
         <button formType="submit">Submit</button>
         <button formType="reset">Reset</button>

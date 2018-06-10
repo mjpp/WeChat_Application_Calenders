@@ -1,12 +1,9 @@
-
+// Initialization
 const date = new Date()
 const years = []
 const months = []
 const days = []
-const name = "gzy"
 const task = ''
-const openID = 'wx-kuo328738921173928273'
-
 for (let i = 1990; i <= date.getFullYear(); i++) {
   years.push(i)
 }
@@ -20,8 +17,8 @@ for (let i = 1; i <= 31; i++) {
 var app = getApp();
 Page({
   data: {
-    name: name,
-    userID: openID,
+    name: '',
+    userID: '',
     userInfo: '',
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo'),
@@ -29,7 +26,7 @@ Page({
     currentDate: '',
     dayList: '',
     currentDayList: '',
-    currentDayStates: '',  // false for nothing, true for tasks
+    currentDayStates: '', 
     currentDayHaveTaskStates: '',
     currentObj: '',
     currentDay: '',
@@ -49,7 +46,6 @@ Page({
     taskKeyListSize: [],
     showModalStatus: false,
     
-
     // temp 
     tempTaskID: [],
     tempTaskName: [],
@@ -69,7 +65,6 @@ Page({
   onLoad: function (options) {
     // parse and store the data sent by the sharer
     this.getInviteCode(options)
-
     var currentObj = this.getCurrentDayString()
     this.setData({
       currentDate: currentObj.getFullYear() + '年' + (currentObj.getMonth() + 1) + '月' + currentObj.getDate() + '日',
@@ -90,7 +85,6 @@ Page({
     var time = myDate.getTime(); //获取当前时间(从1970.1.1开始的毫秒数)
     groupID = this.data.userInfo.nickName + time + '';
     var temp = Object.assign({}, task);
-    console.log(res);
     if (res.target.dataset.sharetype == "complete") {
       temp.status = "completed";
       wx.setStorageSync(taskKeyString, temp);
@@ -104,10 +98,6 @@ Page({
       showShareMessage: false,
       isTempGroup: true,
     })
-    if (res.from === 'button') {
-      // 来自页面内转发按钮
-      // console.log(res.target)
-    }
     var title = this.data.userInfo.nickName + "向您分享了一個任務";
     return {
       title: title,
@@ -202,9 +192,6 @@ Page({
   },
   setSchedule: function (currentObj) {
     var that = this
-    // The below 5 lines gets the number of days in the current months by a tricky way.
-    // 1. Increase month by 1. 2. set the date to be 0 
-    // => Become the last day of the current month, and it implies the number of days in the current month.
     var m = currentObj.getMonth() + 1
     var Y = currentObj.getFullYear()
     var d = currentObj.getDate();
@@ -286,13 +273,10 @@ Page({
             key: key,
           };
         } else {
-          // delete
-          // 1. become black
           s[key] = !s[key];
           this.setData({
             currentDayStates: s
           })
-          // 2. delete item in the selectedDays
           var day = s1[key];
 
           // month
@@ -304,7 +288,6 @@ Page({
           }
           // year
           var year = cur.substr(0, 4);
-          // 3. decrease app.globalData.selectedDaysSize
           for (var i = app.globalData.selectedDaysSize - 1; i >= 0; i--) {
             let selectedDay = app.globalData.selectedDays[i];
             if (selectedDay.year == year && selectedDay.month == month && selectedDay.day == day) {
@@ -326,11 +309,11 @@ Page({
       })
 
     } else if (s3[key]) {
-      // yellow, if click on the day have tasks, show the tasks
+      // if click on the day having tasks, show the tasks
       this.getToTask(s4[key], s5[key]);
     } else {
       wx.showToast({
-        title: "該日期無任務, 請點擊下方''",
+        title: "該日期無任務, 請點擊下方'增加任務'",
         icon: 'none',
         duration: 1000
       })
@@ -356,10 +339,16 @@ Page({
         wx.showToast({
           title: '請填寫任務名',
           icon: 'none',
-          duration: 2000
+          duration: 1000
+        })
+      } else if (app.globalData.selectedDaysSize==0) {
+        wx.showToast({
+          title: '請至少選擇一天',
+          icon: 'none',
+          duration: 1000
         })
       } else {
-        console.log('form发生了submit事件，携带数据为：', e.detail.value);
+        // console.log('form发生了submit事件，携带数据为：', e.detail.value);
         var taskKey = ++app.globalData.taskCount;
         var that = this;
         var s = that.data.selectedDays;
@@ -438,7 +427,7 @@ Page({
 
   },
   formReset: function () {
-    console.log('form发生了reset事件');
+    // console.log('form发生了reset事件');
   },
   startAddingTask: function () {
     this.setData({
@@ -479,14 +468,17 @@ Page({
       day: this.data.days[val[2]]
     })
   },
+    // This function is written for debug purpose, 
+  // it will show all the data in the local repository.
+  // 此功能: getTaskInfo 是用於除錯使用的
+  // 將打印出所有本地存儲的資料
   getTasksInfo: function () {
     for (var i = 1; i <= app.globalData.taskCount; i++) {
       var taskKeyString = i + '';
-      console.log(taskKeyString);
       wx.getStorage({
         key: taskKeyString,
         success: function (res) {
-          console.log(res.data);
+          // console.log(res.data);
         }
       })
     }
@@ -627,8 +619,7 @@ Page({
         hasUserInfo: true
       })
     } else if (this.data.canIUse) {
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
+      // 處理非同步回調(async callback)
       app.userInfoReadyCallback = res => {
         this.setData({
           userInfo: res.userInfo,
@@ -636,7 +627,7 @@ Page({
         })
       }
     } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
+      // 兼容处理
       wx.getUserInfo({
         success: res => {
           app.globalData.userInfo = res.userInfo
@@ -655,11 +646,11 @@ Page({
       name: e.detail.userInfo.nickName,
       hasUserInfo: true
     })
-    console.log("已獲得使用者數據: ");
-    console.log(this.data);
-    console.log("進入小程序");
+    // DEBUG USAGE
+    // console.log("已獲得使用者數據: ");
+    // console.log(this.data);
+    // console.log("進入小程序");
   }, groupSwitchClick: function (e) {
-    console.log(e.detail.value);
     this.setData({
       isTempGroup: e.detail.value,
       showShareMessage: e.detail.value,

@@ -7,8 +7,8 @@
 <view class="page" wx:if="{{hasUserInfo}}">
 
   <!-- SHOW RECEIVE TASK -->
-   
-  <scroll-view scroll-y="true" style="height: 70%;" class="drawer_box" wx:if="{{showReceiveTask}}" >
+
+  <scroll-view scroll-y="true" style="height: 70%;" class="drawer_box" wx:if="{{showReceiveTask}}">
     <view class="drawer_content">
       <view class="empty-block-receive"></view>
       <view class="top grid">
@@ -40,12 +40,12 @@
         <view class="input_h30 col-1 show-bold">{{receiveTask.taskName}}将被加入日程</view>
       </view>
       <view class="top grid" wx:if="{{showModifiedWarning}}">
-      <label class="title col-0"></label>
-      <view class="input_h30 col-1 show-bold">如果接收该消息，</view>
+        <label class="title col-0"></label>
+        <view class="input_h30 col-1 show-bold">如果接收该消息，</view>
       </view>
       <view class="top grid" wx:if="{{showModifiedWarning}}">
-      <label class="title col-0"></label>
-      <view class="input_h30 col-1 show-bold">{{receiveTask.taskName}}将被修改</view>
+        <label class="title col-0"></label>
+        <view class="input_h30 col-1 show-bold">{{receiveTask.taskName}}将被修改</view>
       </view>
 
       <view wx:for="{{receiveTask.selectedDays}}" wx:for-index='key' wx:key="{{key}}">
@@ -74,10 +74,6 @@
           <view class="empty-block-top-decoration"></view>
         </view>
         <form bindsubmit="formSubmit" bindreset="formReset">
-          <!-- <view class="top grid">
-            <label class="title col-0">用戶名</label>
-            <view class="input_h30 col-1 show" name="tempUserName" value="{{tempUserName[key]}}">{{tempUserName[key]}}</view>
-          </view> -->
           <view class="top grid">
             <label class="title col-0">标题</label>
             <input class="input_base input_h30 col-1" name="tempTaskName" value="{{tempTaskName[key]}}">{{tempTaskName[key] || "no title"}}</input>
@@ -105,34 +101,12 @@
           <view class="top grid">
             <button class="single-button-close" bindtap="closeTask">關閉</button>
           </view>
-          <!-- <view class="button-area">
-            <button class="button-area-bt" open-type="share" id="{{key}}">分享</button>
-            <button class="button-area-bt" formType="submit" id="{{key}}" data-submittype='save'>保存修改</button>
-            <button class="button-area-bt" open-type="share" bindtap="setTaskComplete" data-sharetype='complete' id="{{key}}">完成并分享</button>
-            <button class="button-area-bt" id="{{key}}" bindtap="setTaskComplete" value="{{tempTaskID[key]}}">完成</button>
-
-            <button class="button-area-bt-close" bindtap="closeTask">關閉</button>
-          </view> -->
         </form>
       </view>
     </view>
   </scroll-view>
 
   <view class="box">
-
-    <!-- TOP-ROW BUTTONS -->
-    <!-- <view class="box-flex">
-      <view class="flex-item">
-        <button class="item-content"> </button>
-      </view>
-      <view class="flex-item">
-         <button type="warn" bindtap="getTasksInfo">getTasksInfo</button> 
-      </view>
-      <view class="flex-item">
-        <button type="primary" bindtap="closeAddingTask" wx:if="{{isFormOpen}}"> Close task </button>
-        <button type="primary" bindtap="startAddingTask" wx:else> Add task </button>
-      </view>
-    </view> -->
 
     <!-- CHANGE-MONTH & CURRENT-DATE -->
     <view class="box-flex">
@@ -189,20 +163,22 @@
         </view>
       </view>
     </view>
+    <view class="empty-block"></view>
 
     <!-- DAYS -->
     <view class="box-flex">
       <view class="flex-item" wx:for="{{currentDayList}}" wx:for-index='key' wx:for-item="vo" wx:key="{{key}}" id="{{key}}" bindtap="onClick">
         <view class="item-content" wx:if="{{(currentDay != vo || !isCurrentMonth) && !currentDayStates[key] && !currentDayHaveTaskStates[key] && currentDayList[key]!=''}}">{{vo}}</view>
         <view class="item-content not-this-month" wx:if="{{(currentDay != vo || !isCurrentMonth) && !currentDayStates[key] && !currentDayHaveTaskStates[key] && currentDayList[key]==''}}">x</view>
-        <view class="item-content bk-color-day" wx:if="{{currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key]}}">{{vo}}</view>
+        <view class="item-content bk-color-day" wx:if="{{currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key]}}">{{vo}}
+        </view>
 
         <view class="item-content have-task" wx:if="{{currentDayHaveTaskStates[key]}}">{{vo}}</view>
         <view class="item-content select-color-day" wx:if="{{currentDayStates[key] && !currentDayHaveTaskStates[key]}}">
-
           {{vo}}
         </view>
-
+        <view class="today" wx:if="{{currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key]}}"><image class="add-button-img" src="./image/today.jpg" mode="aspectFit" /></view>
+        <view class="today" wx:if="{{!(currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key])}}"></view>
       </view>
     </view>
 
@@ -237,19 +213,11 @@
       <view class="task-content">
         <textarea name="textarea" placeholder="一只船孤独地航行在大海上" />
       </view>
-      <!-- <view class="task">
-        <image class="task-img" src="./image/task-4.jpg" mode="aspectFit" />
-      </view>
-      <view class="task-content-slider">
-        <slider name="slider" show-value block-size="20"></slider>
-      </view> -->
-
 
       <view class="save">
         <button class="save-button reset" formType="reset">重置</button>
         <button class="save-button keep" formType="submit">保存</button>
         <button class="save-button cancel" bindtap="closeAddingTask">取消</button>
-        <!-- <image class="save-img" src="./image/add-task-save.jpg" /> -->
       </view>
     </form>
   </view>

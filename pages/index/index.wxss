@@ -186,15 +186,8 @@ page {
   color: #fff;
 }
 
-/* .task-content-input {
-  border-color: green;
-  border-width: 1.2px;
-  border-style: solid;
-  border-radius: 3px;
-} */
-
 .bk-color-day {
-  background-color: #666;
+  background-color: #e8e8ea;
 }
 
 .transparent {
@@ -208,11 +201,12 @@ page {
 }
 
 .select-color-day {
-  background-color: green;
+  background-color: #1f8ea7;
+  color: #fff;
 }
 
 .have-task {
-  background-color: orange;
+  background-color: #f4d941;
 }
 
 .item-content-current-day {
@@ -366,7 +360,7 @@ page {
   height: 60px;
   text-align: center;
   padding-left: 25%;
-  width:50%;
+  width: 50%;
 }
 
 .empty-block-top-decoration {
@@ -375,8 +369,6 @@ page {
   border-bottom-width: 1.1px;
   border-bottom-style: solid;
 }
-
-
 
 .empty-block-receive {
   height: 40px;
@@ -430,7 +422,6 @@ page {
   font-size: 11px;
   letter-spacing: 2px;
 }
-
 
 .single-button-complete {
   border-color: #1f8ea7;
@@ -530,4 +521,8 @@ radio {
 
 .fr {
   float: right;
+}
+
+.today {
+  height: 12px;
 }

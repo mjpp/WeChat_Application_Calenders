@@ -131,12 +131,8 @@ Page({
         duration: 2000
       })
 
-    } else {
-      wx.showToast({
-        title: 'fail to receive the task',
-        duration: 2000
-      })
-    }
+    } 
+    
     if (this.data.receiveTask != '') {
       this.showReceiveTask();
     }

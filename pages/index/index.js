@@ -98,7 +98,7 @@ Page({
       showShareMessage: false,
       isTempGroup: true,
     })
-    var title = this.data.userInfo.nickName + "向您分享了一個任務";
+    var title = this.data.userInfo.nickName + "向您分享了一个任务";
     return {
       title: title,
       path: '/pages/index/index?sendTask=' + JSON.stringify(this.data.sendTask) + "&uname=" + this.data.userInfo.nickName,
@@ -118,7 +118,7 @@ Page({
         receiveTask: JSON.parse(options.sendTask),
       })
       wx.showToast({
-        title: options.uname + "分享了任務",
+        title: options.uname + "分享了任务",
         icon: 'success',
         duration: 2000
       })
@@ -197,9 +197,9 @@ Page({
     var d = currentObj.getDate();
     var dayString = Y + '/' + m + '/' + currentObj.getDate()
     var currentDayNum = new Date(Y, m, 0).getDate()
-    var currentDayWeek = currentObj.getUTCDay() + 1   // 顯示星期幾
+    var currentDayWeek = currentObj.getUTCDay() + 1   // 显示星期几
     var result = currentDayWeek - (d % 7 - 1);
-    var firstKey = result <= 0 ? 7 + result : result; // 計算出一號應該是星期幾
+    var firstKey = result <= 0 ? 7 + result : result; // 计算出一号应该是星期几
 
     var currentDayHaveTaskStates = []
     var currentDayList = []
@@ -207,8 +207,8 @@ Page({
     var taskKeyList = []
     var taskKeyListSize = []
     var f = 0
-    // 最多42個
-    // 將1 - # of month 寫入一個array並在array的前後適度地添加空格
+    // 最多42个
+    // 将1 - # of month 写入一个array并在array的前后适度地添加空格
     for (var i = 0; i < 42; i++) {
       let data = []
       if (i < firstKey - 1) {
@@ -313,7 +313,7 @@ Page({
       this.getToTask(s4[key], s5[key]);
     } else {
       wx.showToast({
-        title: "該日期無任務, 請點擊下方'增加任務'",
+        title: "该日期无任务, 请点击下方'增加任务'",
         icon: 'none',
         duration: 1000
       })
@@ -337,13 +337,13 @@ Page({
     } else {
       if (e.detail.value.input == "") {
         wx.showToast({
-          title: '請填寫任務名',
+          title: '请填写任务名',
           icon: 'none',
           duration: 1000
         })
       } else if (app.globalData.selectedDaysSize==0) {
         wx.showToast({
-          title: '請至少選擇一天',
+          title: '请至少选择一天',
           icon: 'none',
           duration: 1000
         })
@@ -470,8 +470,8 @@ Page({
   },
     // This function is written for debug purpose, 
   // it will show all the data in the local repository.
-  // 此功能: getTaskInfo 是用於除錯使用的
-  // 將打印出所有本地存儲的資料
+  // 此功能: getTaskInfo 是用于除错使用的
+  // 将打印出所有本地储存的资料
   getTasksInfo: function () {
     for (var i = 1; i <= app.globalData.taskCount; i++) {
       var taskKeyString = i + '';
@@ -619,7 +619,7 @@ Page({
         hasUserInfo: true
       })
     } else if (this.data.canIUse) {
-      // 處理非同步回調(async callback)
+      // 处理非同步回调(async callback)
       app.userInfoReadyCallback = res => {
         this.setData({
           userInfo: res.userInfo,
@@ -647,9 +647,9 @@ Page({
       hasUserInfo: true
     })
     // DEBUG USAGE
-    // console.log("已獲得使用者數據: ");
+    // console.log("已获得使用者数据 ");
     // console.log(this.data);
-    // console.log("進入小程序");
+    // console.log("进入小程序");
   }, groupSwitchClick: function (e) {
     this.setData({
       isTempGroup: e.detail.value,

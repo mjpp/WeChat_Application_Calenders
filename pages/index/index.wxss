@@ -474,7 +474,7 @@ page {
   font-weight: normal;
 }
 
-.show {
+.show-bold {
   font-weight: bold;
 }
 

@@ -1,6 +1,6 @@
 <!-- INITIAL BUTTON -->
 <!-- get the information of users after users click the button  -->
-<button class="button-area-bt-enter" wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 進入小程序 </button>
+<button class="button-area-bt-enter" wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 进入小程序 </button>
 
 
 <!-- CALENDER -->
@@ -61,7 +61,7 @@
     </view>
     <view class="empty-block-receive"></view>
     <view class="top grid button-area">
-      <button class="receive-single-button button-area-bt deny" bindtap="rejectReceiveTask">拒絕</button>
+      <button class="receive-single-button button-area-bt deny" bindtap="rejectReceiveTask">拒绝</button>
       <button class="receive-single-button button-area-bt agree" bindtap="acceptReceiveTask">接受</button>
     </view>
   </scroll-view>
@@ -85,7 +85,7 @@
           <view wx:for="{{tempSelectedDays[key]}}" wx:for-item="vo" wx:for-index='key' wx:key="{{key}}">
             <view class="top grid">
               <label class="title col-0" wx:if="{{key==0}}">日期</label>
-              <label class="title col-0" wx:else></label>
+              <label class="title col-0" wx:else> </label>
               <view class="input_h30 col-1 show" name="tempSelectedDays">{{vo}}</view>
             </view>
           </view>
@@ -96,10 +96,10 @@
           </view>
           <view class="top grid">
             <button class="single-button" open-type="share" bindtap="setTaskComplete" data-sharetype='complete' id="{{key}}">完成并分享</button>
-            <button class="single-button" id="{{key}}" bindtap="setTaskComplete" value="{{tempTaskID[key]}}">設為完成</button>
+            <button class="single-button" id="{{key}}" bindtap="setTaskComplete" value="{{tempTaskID[key]}}">设为完成</button>
           </view>
           <view class="top grid">
-            <button class="single-button-close" bindtap="closeTask">關閉</button>
+            <button class="single-button-close" bindtap="closeTask">关闭</button>
           </view>
         </form>
       </view>

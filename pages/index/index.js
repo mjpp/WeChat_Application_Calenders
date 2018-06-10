@@ -126,13 +126,18 @@ Page({
         receiveTask: JSON.parse(options.sendTask),
       })
       wx.showToast({
-        title: options.uname + "分享了:" + this.data.receiveTask.taskName + "任務",
+        title: options.uname + "分享了任務",
         icon: 'success',
         duration: 2000
       })
 
-    } 
-    
+    } else {
+      wx.showToast({
+        title: '',
+        icon: 'none',
+        duration: 10
+      })
+    }
     if (this.data.receiveTask != '') {
       this.showReceiveTask();
     }

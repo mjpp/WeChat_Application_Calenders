@@ -7,7 +7,8 @@
 <view class="page" wx:if="{{hasUserInfo}}">
 
   <!-- SHOW RECEIVE TASK -->
-  <scroll-view scroll-y="true" style="height: 70%;" class="drawer_box" wx:if="{{showReceiveTask}}">
+   
+  <scroll-view scroll-y="true" style="height: 70%;" class="drawer_box" wx:if="{{showReceiveTask}}" >
     <view class="drawer_content">
       <view class="empty-block-receive"></view>
       <view class="top grid">
@@ -18,52 +19,65 @@
         <label class="title col-0">內容</label>
         <view class=" input_h30 col-1 show">{{receiveTask.content || "no content"}}</view>
       </view>
-      <view class="top grid">
-        <label class="title col-0">日期</label>
-        <view class=" input_h30 col-1 show">
-          <text wx:for="{{receiveTask.selectedDays}}" wx:for-index='key' wx:key="{{key}}">
-          <text>{{receiveTask.selectedDays[key].year}}/{{receiveTask.selectedDays[key].month}}/{{receiveTask.selectedDays[key].day}} </text>
-          </text>
+      <view class="top grid" wx:if="{{showCompleteWarning}}">
+        <label class="title col-0">注意</label>
+        <view class=" input_h30 col-1 show-bold">{{receiveTask.taskName}}已被完成</view>
+      </view>
+      <view class="top grid" wx:if="{{showCompleteWarning}}">
+        <label class="title col-0"></label>
+        <view class=" input_h30 col-1 show-bold">如果接收该消息，{{receiveTask.taskName}}将被消除</view>
+      </view>
+      <view class="top grid" wx:if="{{showProcessingWarning}}">
+        <label class="title col-0">注意</label>
+        <view class=" input_h30 col-1 show-bold">{{receiveTask.userName}}向你分享了{{receiveTask.taskName}}</view>
+      </view>
+      <view class="top grid" wx:if="{{showProcessingWarning}}">
+        <label class="title col-0"></label>
+        <view class="input_h30 col-1 show-bold">如果接收该消息，</view>
+      </view>
+      <view class="top grid" wx:if="{{showProcessingWarning}}">
+        <label class="title col-0"></label>
+        <view class="input_h30 col-1 show-bold">{{receiveTask.taskName}}将被加入日程</view>
+      </view>
+      <view class="top grid" wx:if="{{showModifiedWarning}}">
+      <label class="title col-0"></label>
+      <view class="input_h30 col-1 show-bold">如果接收该消息，</view>
+      </view>
+      <view class="top grid" wx:if="{{showModifiedWarning}}">
+      <label class="title col-0"></label>
+      <view class="input_h30 col-1 show-bold">{{receiveTask.taskName}}将被修改</view>
+      </view>
+
+      <view wx:for="{{receiveTask.selectedDays}}" wx:for-index='key' wx:key="{{key}}">
+        <view class="top grid">
+          <label class="title col-0" wx:if="{{key==0}}">日期</label>
+          <label class="title col-0" wx:else></label>
+          <view class=" input_h30 col-1 show">
+            {{receiveTask.selectedDays[key].year}}/{{receiveTask.selectedDays[key].month}}/{{receiveTask.selectedDays[key].day}}
+          </view>
         </view>
       </view>
-      <view class="top grid" wx:if="{{showCompleteWarning}}">
-        <label class="title col-0">注意</label>
-        <view class=" input_h30 col-1 show">{{receiveTask.taskName}}已被完成</view>
-      </view>
-      <view class="top grid" wx:if="{{showCompleteWarning}}">
-        <label class="title col-0"></label>
-        <view class=" input_h30 col-1 show">如果接收该消息，{{receiveTask.taskName}}将被消除</view>
-      </view>
-      <view class="top grid" wx:if="{{showProcessingWarning}}">
-        <label class="title col-0">注意</label>
-        <view class=" input_h30 col-1 show">{{receiveTask.userName}}向你分享了{{receiveTask.taskName}}</view>
-      </view>
-      <view class="top grid" wx:if="{{showProcessingWarning}}">
-        <label class="title col-0"></label>
-        <view class="input_h30 col-1 show">如果接收该消息，{{receiveTask.taskName}}</view>
-      </view>
-      <view class="top grid" wx:if="{{showProcessingWarning}}">
-        <label class="title col-0"></label>
-        <view class="input_h30 col-1 show">将被加入日程</view>
-      </view>
+
     </view>
     <view class="empty-block-receive"></view>
-    <view class="button-area">
-      <button class="button-area-bt agree" bindtap="acceptReceiveTask">接受</button>
-      <button class="button-area-bt deny" bindtap="rejectReceiveTask">拒絕</button>
+    <view class="top grid button-area">
+      <button class="receive-single-button button-area-bt deny" bindtap="rejectReceiveTask">拒絕</button>
+      <button class="receive-single-button button-area-bt agree" bindtap="acceptReceiveTask">接受</button>
     </view>
   </scroll-view>
 
   <!-- TASK-LIST FOR CERTAIN DATE -->
-  <scroll-view scroll-y="true" style="height: 70%;" class="drawer_box" wx:if="{{showModalStatus}}">
+  <scroll-view scroll-y="true" style="height: 60%;" class="drawer_box" wx:if="{{showModalStatus}}">
     <view wx:for="{{tempTaskID}}" wx:for-index='key' wx:key="{{key}}">
       <view class="drawer_content">
-        <view class="empty-block"></view>
+        <view class="empty-block-top">
+          <view class="empty-block-top-decoration"></view>
+        </view>
         <form bindsubmit="formSubmit" bindreset="formReset">
-          <view class="top grid">
+          <!-- <view class="top grid">
             <label class="title col-0">用戶名</label>
             <view class="input_h30 col-1 show" name="tempUserName" value="{{tempUserName[key]}}">{{tempUserName[key]}}</view>
-          </view>
+          </view> -->
           <view class="top grid">
             <label class="title col-0">标题</label>
             <input class="input_base input_h30 col-1" name="tempTaskName" value="{{tempTaskName[key]}}">{{tempTaskName[key] || "no title"}}</input>
@@ -72,19 +86,33 @@
             <label class="title col-0">內容</label>
             <input class="input_base input_h30 col-1" name="tempTaskContent" value="{{tempTaskContent[key]}}">{{tempTaskContent[key] || "no content"}}</input>
           </view>
-          <view class="top grid">
-            <label class="title col-0">日期</label>
-            <view class="input_h30 col-1 show" name="tempSelectedDays">{{tempSelectedDays[key]}}</view>
+          <view wx:for="{{tempSelectedDays[key]}}" wx:for-item="vo" wx:for-index='key' wx:key="{{key}}">
+            <view class="top grid">
+              <label class="title col-0" wx:if="{{key==0}}">日期</label>
+              <label class="title col-0" wx:else></label>
+              <view class="input_h30 col-1 show" name="tempSelectedDays">{{vo}}</view>
+            </view>
           </view>
           <view class="empty-block"></view>
-          <view class="button-area">
+          <view class="top grid">
+            <button class="single-button" open-type="share" id="{{key}}">分享</button>
+            <button class="single-button" formType="submit" id="{{key}}" data-submittype='save'>保存修改</button>
+          </view>
+          <view class="top grid">
+            <button class="single-button" open-type="share" bindtap="setTaskComplete" data-sharetype='complete' id="{{key}}">完成并分享</button>
+            <button class="single-button" id="{{key}}" bindtap="setTaskComplete" value="{{tempTaskID[key]}}">設為完成</button>
+          </view>
+          <view class="top grid">
+            <button class="single-button-close" bindtap="closeTask">關閉</button>
+          </view>
+          <!-- <view class="button-area">
             <button class="button-area-bt" open-type="share" id="{{key}}">分享</button>
             <button class="button-area-bt" formType="submit" id="{{key}}" data-submittype='save'>保存修改</button>
             <button class="button-area-bt" open-type="share" bindtap="setTaskComplete" data-sharetype='complete' id="{{key}}">完成并分享</button>
             <button class="button-area-bt" id="{{key}}" bindtap="setTaskComplete" value="{{tempTaskID[key]}}">完成</button>
 
             <button class="button-area-bt-close" bindtap="closeTask">關閉</button>
-          </view>
+          </view> -->
         </form>
       </view>
     </view>
@@ -168,8 +196,12 @@
         <view class="item-content" wx:if="{{(currentDay != vo || !isCurrentMonth) && !currentDayStates[key] && !currentDayHaveTaskStates[key] && currentDayList[key]!=''}}">{{vo}}</view>
         <view class="item-content not-this-month" wx:if="{{(currentDay != vo || !isCurrentMonth) && !currentDayStates[key] && !currentDayHaveTaskStates[key] && currentDayList[key]==''}}">x</view>
         <view class="item-content bk-color-day" wx:if="{{currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key]}}">{{vo}}</view>
-        <view class="item-content select-color-day" wx:if="{{currentDayStates[key] && !currentDayHaveTaskStates[key]}}">{{vo}}</view>
+
         <view class="item-content have-task" wx:if="{{currentDayHaveTaskStates[key]}}">{{vo}}</view>
+        <view class="item-content select-color-day" wx:if="{{currentDayStates[key] && !currentDayHaveTaskStates[key]}}">
+
+          {{vo}}
+        </view>
 
       </view>
     </view>

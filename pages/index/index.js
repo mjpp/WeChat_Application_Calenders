@@ -48,6 +48,7 @@ Page({
     taskKeyList: [],
     taskKeyListSize: [],
     showModalStatus: false,
+    
 
     // temp 
     tempTaskID: [],
@@ -63,6 +64,7 @@ Page({
     showReceiveTask: false,
     showCompleteWarning: false,
     showProcessingWarning: false,
+    showModifiedWarning: false,
   },
   onLoad: function (options) {
     // parse and store the data sent by the sharer
@@ -167,16 +169,25 @@ Page({
     currentObj = new Date(str)
     var time = new Date();
     var b;
-    if (currentObj.getMonth() == time.getMonth) {
+    if (currentObj.getMonth() == time.getMonth()) {
       b = true;
     } else {
       b = false;
     }
-    this.setData({
-      currentDate: currentObj.getFullYear() + '年' + (currentObj.getMonth() + 1) + '月',
-      currentObj: currentObj,
-      isCurrentMonth: b
-    })
+    if (b) {
+      this.setData({
+        currentDate: currentObj.getFullYear() + '年' + (currentObj.getMonth() + 1) + '月' + time.getDate() + '日',
+        currentObj: currentObj,
+        isCurrentMonth: b
+      })
+    }
+    else {
+      this.setData({
+        currentDate: currentObj.getFullYear() + '年' + (currentObj.getMonth() + 1) + '月',
+        currentObj: currentObj,
+        isCurrentMonth: b
+      })
+    }
     this.setSchedule(currentObj);
   },
   getCurrentDayString: function () {
@@ -249,57 +260,60 @@ Page({
       var s = that.data.currentDayStates
       var s1 = that.data.currentDayList;
       var cur = that.data.currentDate;
-      if (!s[key]) {
-        s[key] = !s[key];
-        this.setData({
-          currentDayStates: s
-        })
-        // day
-        var day = s1[key];
+      if (s1[key] != "") {
+        if (!s[key]) {
+          s[key] = !s[key];
+          this.setData({
+            currentDayStates: s
+          })
+          // day
+          var day = s1[key];
 
-        // month
-        var month;
-        if (cur.substr(6, 1) == '月') {
-          month = cur.substr(5, 1);
+          // month
+          var month;
+          if (cur.substr(6, 1) == '月') {
+            month = cur.substr(5, 1);
+          } else {
+            month = cur.substr(5, 2);
+          }
+          // year
+          var year = cur.substr(0, 4);
+
+          app.globalData.selectedDays[app.globalData.selectedDaysSize++] = {
+            month: month,
+            year: year,
+            day: day,
+            key: key,
+          };
         } else {
-          month = cur.substr(5, 2);
-        }
-        // year
-        var year = cur.substr(0, 4);
+          // delete
+          // 1. become black
+          s[key] = !s[key];
+          this.setData({
+            currentDayStates: s
+          })
+          // 2. delete item in the selectedDays
+          var day = s1[key];
 
-        app.globalData.selectedDays[app.globalData.selectedDaysSize++] = {
-          month: month,
-          year: year,
-          day: day,
-          key: key,
-        };
-      } else {
-        // delete
-        // 1. become black
-        s[key] = !s[key];
-        this.setData({
-          currentDayStates: s
-        })
-        // 2. delete item in the selectedDays
-        var day = s1[key];
-
-        // month
-        var month;
-        if (cur.substr(6, 1) == '月') {
-          month = cur.substr(5, 1);
-        } else {
-          month = cur.substr(5, 2);
-        }
-        // year
-        var year = cur.substr(0, 4);
-        // 3. decrease app.globalData.selectedDaysSize
-        for (var i = app.globalData.selectedDaysSize - 1; i >= 0; i--) {
-          let selectedDay = app.globalData.selectedDays[i];
-          if (selectedDay.year == year && selectedDay.month == month && selectedDay.day == day) {
-            app.globalData.selectedDays.splice(i, 1);
-            app.globalData.selectedDaysSize--;
+          // month
+          var month;
+          if (cur.substr(6, 1) == '月') {
+            month = cur.substr(5, 1);
+          } else {
+            month = cur.substr(5, 2);
+          }
+          // year
+          var year = cur.substr(0, 4);
+          // 3. decrease app.globalData.selectedDaysSize
+          for (var i = app.globalData.selectedDaysSize - 1; i >= 0; i--) {
+            let selectedDay = app.globalData.selectedDays[i];
+            if (selectedDay.year == year && selectedDay.month == month && selectedDay.day == day) {
+              app.globalData.selectedDays.splice(i, 1);
+              app.globalData.selectedDaysSize--;
+            }
           }
         }
+
 
       }
       var results = [];
@@ -314,6 +328,12 @@ Page({
     } else if (s3[key]) {
       // yellow, if click on the day have tasks, show the tasks
       this.getToTask(s4[key], s5[key]);
+    } else {
+      wx.showToast({
+        title: "該日期無任務, 請點擊下方''",
+        icon: 'none',
+        duration: 1000
+      })
     }
 
   },
@@ -325,7 +345,7 @@ Page({
       var task = wx.getStorageSync(taskKeyString);
       var temp = Object.assign({}, task);
       temp.taskName = e.detail.value.tempTaskName;
-      temp.content = e.detail.value.tempTaskContent;   
+      temp.content = e.detail.value.tempTaskContent;
       wx.setStorageSync(taskKeyString, temp);
       this.setData({
         showModalStatus: false,
@@ -664,10 +684,33 @@ Page({
           showProcessingWarning: false
         })
       } else if (this.data.receiveTask.status == "processing") {
-        this.setData({
-          showCompleteWarning: false,
-          showProcessingWarning: true,
-        })
+        var receiveTask = this.data.receiveTask;
+        var found = false;
+        var foundKey;
+        for (var i = 1; i <= app.globalData.taskCount; i++) {
+          var key = i;
+          var taskKeyString = key + '';
+          var task = wx.getStorageSync(taskKeyString);
+          if (task.groupID == receiveTask.groupID) {
+            found = true;
+            foundKey = i;
+            break;
+          }
+        }
+        if (found) {
+          this.setData({
+            showCompleteWarning: false,
+            showProcessingWarning: false,
+            showModifiedWarning: true,
+          })
+        }
+        else {
+          this.setData({
+            showCompleteWarning: false,
+            showProcessingWarning: true,
+            showModifiedWarning: false,
+          })
+        }
       }
       this.setData({
         showReceiveTask: true

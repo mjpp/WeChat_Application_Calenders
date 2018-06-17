@@ -6,8 +6,32 @@
 <!-- CALENDER -->
 <view class="page" wx:if="{{hasUserInfo}}">
 
-  <!-- SHOW RECEIVE TASK -->
+  <!-- SHOW COMPLETE TASKS -->
+  <button class="button-area-bt-completed_tasks" bindtap="showCompletedTasks">Completed Tasks</button>
+  <scroll-view scroll-y="true" style="height: 60%;" class="drawer_box" wx:if="{{showCompletedTasks}}">
+    <form bindsubmit="formSubmit" bindreset="formReset">
 
+      <checkbox-group name="checkbox">
+        <view class="top grid">
+          <view class="title col-0"></view>
+          <view class="input_base_completed input_h30 col-1">已完成任務</view>
+        </view>
+        <label wx:for="{{completedTaskItems}}" wx:for-item="item" wx:for-index='key' wx:key="{{key}}">
+          <view class="top grid">
+            <checkbox class="title col-0" value="{{item.taskID}}"/>
+            <view class="input_base_completed input_h30 col-1">任務 {{item.taskName}}</view>
+          </view>
+        </label>
+      </checkbox-group>
+      <button class="single-button-close" formType="submit"  data-submittype='returnToProcessing'>確定修改</button>
+      <view class="top grid">
+        <button class="single-button-close" bindtap="closeCompletedTasks">关闭</button>
+      </view>
+    </form>
+  </scroll-view>
+
+
+  <!-- SHOW RECEIVE TASK -->
   <scroll-view scroll-y="true" style="height: 70%;" class="drawer_box" wx:if="{{showReceiveTask}}">
     <view class="drawer_content">
       <view class="empty-block-receive"></view>
@@ -177,7 +201,9 @@
         <view class="item-content select-color-day" wx:if="{{currentDayStates[key] && !currentDayHaveTaskStates[key]}}">
           {{vo}}
         </view>
-        <view class="today" wx:if="{{currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key]}}"><image class="add-button-img" src="./image/today.jpg" mode="aspectFit" /></view>
+        <view class="today" wx:if="{{currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key]}}">
+          <image class="add-button-img" src="./image/today.jpg" mode="aspectFit" />
+        </view>
         <view class="today" wx:if="{{!(currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key])}}"></view>
       </view>
     </view>
@@ -212,6 +238,19 @@
       </view>
       <view class="task-content">
         <textarea name="textarea" placeholder="一只船孤独地航行在大海上" />
+      </view>
+      <view class="task">
+        <image class="task-img" src="./image/task-4.jpg" mode="aspectFit" />
+      </view>
+      <view class="task-content-slider-box">
+        <slider name="importance" class="task-content-slider" max='5' activeColor="#ee405d" show-value bindchanging="sliderChange"></slider>
+        <view class="color-block" style="background-color: {{tempColor}};"></view>
+      </view>
+      <view class="task">
+        <image class="task-img" src="./image/task-2.jpg" mode="aspectFit" />
+      </view>
+      <view class="task-content">
+        <input name="category" placeholder="输入任务分類" />
       </view>
 
       <view class="save">

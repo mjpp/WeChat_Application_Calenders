@@ -4,6 +4,7 @@ const years = []
 const months = []
 const days = []
 const task = ''
+const colors = ["#636363", "#a67abc", "#8a97e0", "#1fb9a2", "#e3a65d", "#e44848"];
 for (let i = 1990; i <= date.getFullYear(); i++) {
   years.push(i)
 }
@@ -26,7 +27,7 @@ Page({
     currentDate: '',
     dayList: '',
     currentDayList: '',
-    currentDayStates: '', 
+    currentDayStates: '',
     currentDayHaveTaskStates: '',
     currentObj: '',
     currentDay: '',
@@ -45,13 +46,21 @@ Page({
     taskKeyList: [],
     taskKeyListSize: [],
     showModalStatus: false,
-    
+
     // temp 
     tempTaskID: [],
     tempTaskName: [],
     tempTaskContent: [],
     tempUserName: [],
     tempSelectedDays: [],
+
+    // completed
+    completedTaskItems: [],
+    completedTaskBackToProcessingTaskID: [],
+    showCompletedTasks: false,
+
+    tempSliderValue: 0,
+    tempColor: "#636363",
     isTempGroup: false,
     showShareMessage: false,
     sendTask: '',
@@ -272,6 +281,24 @@ Page({
             day: day,
             key: key,
           };
+          app.globalData.selectedDays.sort(function (a, b) {
+            if (a.year < b.year)
+              return -1;
+            else if (a.year > b.year)
+              return 1;
+            else {
+              if (a.month < b.month)
+                return - 1;
+              else if (a.month > b.month)
+                return 1;
+              else {
+                if (a.day < b.day)
+                  return - 1;
+                else if (a.day > b.day)
+                  return 1;
+              }
+            }
+          });
         } else {
           s[key] = !s[key];
           this.setData({
@@ -334,6 +361,53 @@ Page({
         showModalStatus: false,
       })
 
+    } else if (e.detail.target.dataset.submittype == 'returnToProcessing') {
+      var checkbox = e.detail.value.checkbox;
+      for (var i = 0; i < checkbox.length; i++) {
+        var taskKey = checkbox[i];
+        var taskKeyString = taskKey + '';
+        var task = wx.getStorageSync(taskKeyString);
+        var temp = Object.assign({}, task)
+        temp.status = 'processing';
+        wx.setStorageSync(taskKeyString, temp);
+      }
+
+      // var id = e.currentTarget.id;
+      // var taskKey = this.data.tempTaskID[id];
+
+      // var taskKeyString = taskKey + '';
+      // var task = wx.getStorageSync(taskKeyString);
+      // var temp = Object.assign({}, task)
+      // temp.status = 'completed';
+      // wx.setStorageSync(taskKeyString, temp);
+      // this.setData({
+      //   showModalStatus: false,
+      // })
+
+      var that = this;
+      var currentDayHaveTaskStates = []
+      var currentDayStates = []
+      var taskKeyList = []
+      var taskKeyListSize = []
+      for (var i = 0; i < 42; i++) {
+        currentDayStates[i] = false;
+        currentDayHaveTaskStates[i] = false;
+        taskKeyList[i] = [];
+        taskKeyListSize[i] = 0;
+      }
+      that.setData({
+        currentDayStates: currentDayStates,
+        currentDayHaveTaskStates: currentDayHaveTaskStates,
+        taskKeyList: taskKeyList,
+        taskKeyListSize: taskKeyListSize
+      })
+
+      this.modifyDayHaveTaskStates();
+
+
+      this.setData({
+        showCompletedTasks: false,
+      })
     } else {
       if (e.detail.value.input == "") {
         wx.showToast({
@@ -341,7 +415,7 @@ Page({
           icon: 'none',
           duration: 1000
         })
-      } else if (app.globalData.selectedDaysSize==0) {
+      } else if (app.globalData.selectedDaysSize == 0) {
         wx.showToast({
           title: '请至少选择一天',
           icon: 'none',
@@ -468,7 +542,7 @@ Page({
       day: this.data.days[val[2]]
     })
   },
-    // This function is written for debug purpose, 
+  // This function is written for debug purpose, 
   // it will show all the data in the local repository.
   // 此功能: getTaskInfo 是用于除错使用的
   // 将打印出所有本地储存的资料
@@ -829,4 +903,82 @@ Page({
       showReceiveTask: false,
     })
   },
-})  
+  sliderChange: function (e) {
+    var value = e.detail.value;
+    var currentValue = this.data.tempSliderValue;
+    if (value != currentValue) {
+      // modify the value
+      let color = colors[value];
+      this.setData({
+        tempSliderValue: value,
+        tempColor: color,
+      })
+    }
+  },
+  showCompletedTasks: function () {
+    if (app.globalData.taskCount == 0) {
+      console.log('there is no data in the database');
+    } else {
+
+      var completedTaskItems = [];
+      for (var i = 1; i <= app.globalData.taskCount; i++) {
+        var taskKeyString = i + '';
+        try {
+          var value = wx.getStorageSync(taskKeyString)
+          if (value) {
+            if (value.status == 'completed') {
+              var singleTaskItem = {
+                taskID: '',
+                taskName: '',
+                selectedDays: '',
+              };
+              singleTaskItem.taskID = value.taskID;
+              singleTaskItem.taskName = value.taskName;
+              singleTaskItem.selectedDays = value.selectedDays;
+              completedTaskItems.push(singleTaskItem);
+            }
+          }
+        } catch (e) {
+          console.log('there is no such stored data with the key ' + taskKeyString);
+          console.log('error message: ' + e);
+        }
+      }
+      this.setData({
+        completedTaskItems: completedTaskItems,
+      })
+      // console.log(this.data.completedTaskItems);
+    }
+    this.setData({
+      showCompletedTasks: true,
+    })
+  },
+  closeCompletedTasks: function () {
+    this.setData({
+      showCompletedTasks: false,
+    })
+  },
+  checkboxChange: function (e) {
+    // for (var i = 0; i < e.detail.value.length;i++){
+    // }
+  }
+})
+
+// const: ["#636363", "#a67abc","#8a97e0","#1fb9a2","#e3a65d","#e44848" ]
+// data: add tempSliderValue: 0;
+// add a function: sliderChange
+// < view class="task" >
+//   <image class="task-img" src= "./image/task-4.jpg" mode= "aspectFit" />
+// </view>
+// < view class="task-content-slider-box" >
+//   <slider name="importance" class="task-content-slider" max= '5' activeColor= "#ee405d" show- value bindchanging= "sliderChange" > </slider> 
+//   < view class="color-block" style= "background-color: #ee405d;" > </view>
+// < /view>
+
+
+// 新增分類
+// < view class="task" >
+//   <image class="task-img" src= "./image/task-2.jpg" mode= "aspectFit" />
+// </view>
+// < view class="task-content" >
+//   <input name="category" placeholder= "输入任务分類" />
+// </view>

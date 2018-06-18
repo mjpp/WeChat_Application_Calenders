@@ -58,6 +58,8 @@ Page({
     completedTaskItems: [],
     completedTaskBackToProcessingTaskID: [],
     showCompletedTasks: false,
+    showCompletedTasksSecondlayer: false,
+    noCompletedTask: true,
 
     tempSliderValue: 0,
     tempColor: "#636363",
@@ -362,52 +364,34 @@ Page({
       })
 
     } else if (e.detail.target.dataset.submittype == 'returnToProcessing') {
-      var checkbox = e.detail.value.checkbox;
-      for (var i = 0; i < checkbox.length; i++) {
-        var taskKey = checkbox[i];
-        var taskKeyString = taskKey + '';
-        var task = wx.getStorageSync(taskKeyString);
-        var temp = Object.assign({}, task)
-        temp.status = 'processing';
-        wx.setStorageSync(taskKeyString, temp);
+      if (e.detail.value.checkbox.length == 0) {
+        wx.showToast({
+          title: '请至少选择一個任務',
+          icon: 'none',
+          duration: 1000
+        })
+      } else {
+        var completedTaskBackToProcessingTaskID = [];
+        for (var i = 0; i < e.detail.value.checkbox.length; i++) {
+          var taskKey = e.detail.value.checkbox[i];
+          var taskKeyString = taskKey + '';
+          var value = wx.getStorageSync(taskKeyString)
+          console.log(value);
+          var singleTaskItem = {
+            taskID: '',
+            taskName: '',
+            selectedDays: '',
+          };
+          singleTaskItem.taskID = value.taskID;
+          singleTaskItem.taskName = value.taskName;
+          singleTaskItem.selectedDays = value.selectedDays;
+          completedTaskBackToProcessingTaskID.push(singleTaskItem);
+        }
+        this.setData({
+          completedTaskBackToProcessingTaskID: completedTaskBackToProcessingTaskID,
+          showCompletedTasksSecondlayer: true,
+        })
       }
-
-      // var id = e.currentTarget.id;
-      // var taskKey = this.data.tempTaskID[id];
-
-      // var taskKeyString = taskKey + '';
-      // var task = wx.getStorageSync(taskKeyString);
-      // var temp = Object.assign({}, task)
-      // temp.status = 'completed';
-      // wx.setStorageSync(taskKeyString, temp);
-      // this.setData({
-      //   showModalStatus: false,
-      // })
-
-      var that = this;
-      var currentDayHaveTaskStates = []
-      var currentDayStates = []
-      var taskKeyList = []
-      var taskKeyListSize = []
-      for (var i = 0; i < 42; i++) {
-        currentDayStates[i] = false;
-        currentDayHaveTaskStates[i] = false;
-        taskKeyList[i] = [];
-        taskKeyListSize[i] = 0;
-      }
-      that.setData({
-        currentDayStates: currentDayStates,
-        currentDayHaveTaskStates: currentDayHaveTaskStates,
-        taskKeyList: taskKeyList,
-        taskKeyListSize: taskKeyListSize
-      })
-
-      this.modifyDayHaveTaskStates();
-
-
-      this.setData({
-        showCompletedTasks: false,
-      })
     } else {
       if (e.detail.value.input == "") {
         wx.showToast({
@@ -720,10 +704,6 @@ Page({
       name: e.detail.userInfo.nickName,
       hasUserInfo: true
     })
-    // DEBUG USAGE
-    // console.log("已获得使用者数据 ");
-    // console.log(this.data);
-    // console.log("进入小程序");
   }, groupSwitchClick: function (e) {
     this.setData({
       isTempGroup: e.detail.value,
@@ -951,15 +931,95 @@ Page({
     this.setData({
       showCompletedTasks: true,
     })
+    var isanycompleted = this.checkanycompleted();
+    if (!isanycompleted) {
+      this.setData({
+        noCompletedTask: true,
+      })
+    } else {
+      this.setData({
+        noCompletedTask: false,
+      })
+    }
   },
   closeCompletedTasks: function () {
     this.setData({
       showCompletedTasks: false,
     })
   },
-  checkboxChange: function (e) {
-    // for (var i = 0; i < e.detail.value.length;i++){
-    // }
+  closeCompletedTasksSecond: function () {
+    this.setData({
+      showCompletedTasksSecondlayer: false,
+    })
+  },
+  changeStatusBackToProcessing: function () {
+
+
+
+    
+    for (var i = 0; i < this.data.completedTaskBackToProcessingTaskID.length; i++) {
+      var taskKey = this.data.completedTaskBackToProcessingTaskID[i].taskID;
+      var taskKeyString = taskKey + '';
+      var task = wx.getStorageSync(taskKeyString);
+      var temp = Object.assign({}, task)
+      temp.status = 'processing';
+      wx.setStorageSync(taskKeyString, temp);
+    }
+
+    // var id = e.currentTarget.id;
+    // var taskKey = this.data.tempTaskID[id];
+
+    // var taskKeyString = taskKey + '';
+    // var task = wx.getStorageSync(taskKeyString);
+    // var temp = Object.assign({}, task)
+    // temp.status = 'completed';
+    // wx.setStorageSync(taskKeyString, temp);
+    // this.setData({
+    //   showModalStatus: false,
+    // })
+
+    var that = this;
+    var currentDayHaveTaskStates = []
+    var currentDayStates = []
+    var taskKeyList = []
+    var taskKeyListSize = []
+    for (var i = 0; i < 42; i++) {
+      currentDayStates[i] = false;
+      currentDayHaveTaskStates[i] = false;
+      taskKeyList[i] = [];
+      taskKeyListSize[i] = 0;
+    }
+    that.setData({
+      currentDayStates: currentDayStates,
+      currentDayHaveTaskStates: currentDayHaveTaskStates,
+      taskKeyList: taskKeyList,
+      taskKeyListSize: taskKeyListSize
+    })
+
+    this.modifyDayHaveTaskStates();
+
+
+
+
+
+    this.setData({
+      showCompletedTasks: false,
+      showCompletedTasksSecondlayer: false,
+    })
+  },
+  checkanycompleted: function () {
+    var isAnyTaskCompleted = false;
+    // return true if there is any task whose status is 'completed'
+    for (var i = 1; i <= app.globalData.taskCount; i++) {
+      var taskKeyString = i + '';
+      var task = wx.getStorageSync(taskKeyString);
+      var temp = Object.assign({}, task)
+      if (temp.status == 'completed') {
+        isAnyTaskCompleted = true;
+        break;
+      }
+    }
+    return isAnyTaskCompleted;
   }
 })
 

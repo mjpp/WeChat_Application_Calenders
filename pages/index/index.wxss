@@ -37,6 +37,8 @@ page {
 
 .item-content {
   margin: 5px;
+  margin-bottom: 0px;
+  margin-top: 10px;
   text-align: center;
   background-color: #fff;
   height: 2rem;
@@ -152,7 +154,6 @@ page {
   width: 12%;
   text-align: center;
 }
-
 
 .save {
   display: -webkit-box;
@@ -270,6 +271,22 @@ page {
   color: #1f8ea7;
 }
 
+.drawer_popping_window {
+  width: 650rpx;
+  overflow: hidden;
+  position: fixed;
+  top: 8%;
+  left: 0;
+  z-index: 2001;
+  background: #f7f8f8;
+  margin: 0 50rpx 0 50rpx;
+  border-radius: 6px;
+  border-color: #ee405d;
+  border-width: 2px;
+  border-style: solid;
+  color: #1f8ea7;
+}
+
 .drawer_title {
   padding: 15px;
   font: 20px "microsoft yahei";
@@ -320,6 +337,7 @@ page {
 .button-area-bt-enter {
   text-align: center;
   letter-spacing: 2.5px;
+  margin-top: 2rem;
   color: #1f8ea7;
   font-size: 14px;
   font-weight: bold;
@@ -334,7 +352,7 @@ page {
   text-align: center;
   letter-spacing: 2.5px;
   color: #fff;
-  background-color: #1f8ea7; 
+  background-color: #1f8ea7;
   font-size: 14px;
   font-weight: bold;
   margin-top: 3px;
@@ -498,6 +516,62 @@ page {
   font-size: 14px;
   letter-spacing: 2px;
 }
+
+.complete-button-confirm {
+  border-color: #1f8ea7;
+  background-color: #1f8ea7;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 4px;
+  width: 480rpx;
+  margin-left: 80rpx;
+  text-align: center;
+  display: inline-block;
+  font: 300 28rpx/30px "microsoft yahei";
+  font-weight: bold;
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.complete-button-close {
+  border-color: #1f8ea7;
+  background-color: #fff;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 4px;
+  width: 480rpx;
+  margin-left: 80rpx;
+  text-align: center;
+  display: inline-block;
+  font: 300 28rpx/30px "microsoft yahei";
+  font-weight: bold;
+  color: #1f8ea7;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.title_complete_task {
+  width: 635rpx;
+  text-align: center;
+  margin: 5rpx;
+  letter-spacing: 2px;
+  font-style: bold;
+  font-size: 16px;
+  margin-bottom: 15rpx;
+}
+
+.title_no_complete_task {
+  width: 635rpx;
+  text-align: center;
+  margin: 5rpx;
+  margin-top: 50rpx;
+  letter-spacing: 2px;
+  font-style: bold;
+  font-size: 16px;
+  margin-bottom: 15rpx;
+}
+
 
 .input_h60 {
   height: 60px;

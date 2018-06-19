@@ -272,7 +272,7 @@ page {
 }
 
 .drawer_popping_window {
-  width: 650rpx;
+  width: 550rpx;
   overflow: hidden;
   position: fixed;
   top: 8%;
@@ -280,8 +280,9 @@ page {
   z-index: 2001;
   background: #f7f8f8;
   margin: 0 50rpx 0 50rpx;
+  margin-left: 100rpx;
   border-radius: 6px;
-  border-color: #ee405d;
+  border-color: #1f8ea7;
   border-width: 2px;
   border-style: solid;
   color: #1f8ea7;
@@ -409,17 +410,27 @@ page {
 }
 
 .empty-block-top {
-  height: 60px;
+  height: 50px;
   text-align: center;
   padding-left: 25%;
   width: 50%;
 }
 
 .empty-block-top-decoration {
-  height: 0.5em;
+  height: 0.7em;
   border-bottom-color: #1f8ea7;
   border-bottom-width: 1.1px;
   border-bottom-style: solid;
+}
+
+.title_no_complete_task_cross_2 {
+  position: fixed;
+  width: 20%;
+  text-align: right;
+  letter-spacing: 2px;
+  font-style: bold;
+  font-size: 21px;
+  color: #8b8b8b;
 }
 
 .empty-block-receive {
@@ -528,7 +539,6 @@ page {
   text-align: center;
   display: inline-block;
   font: 300 28rpx/30px "microsoft yahei";
-  font-weight: bold;
   color: #fff;
   font-size: 14px;
   letter-spacing: 2px;
@@ -545,11 +555,44 @@ page {
   text-align: center;
   display: inline-block;
   font: 300 28rpx/30px "microsoft yahei";
-  font-weight: bold;
   color: #1f8ea7;
   font-size: 14px;
   letter-spacing: 2px;
 }
+
+
+.complete-button-confirm-2 {
+  border-color: #1f8ea7;
+  background-color: #1f8ea7;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 4px;
+  width: 380rpx;
+  margin-left: 80rpx;
+  text-align: center;
+  display: inline-block;
+  font: 300 28rpx/30px "microsoft yahei";
+  color: #fff;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
+.complete-button-close-2 {
+  border-color: #1f8ea7;
+  background-color: #fff;
+  border-width: 2px;
+  border-style: solid;
+  border-radius: 4px;
+  width: 380rpx;
+  margin-left: 80rpx;
+  text-align: center;
+  display: inline-block;
+  font: 300 28rpx/30px "microsoft yahei";
+  color: #1f8ea7;
+  font-size: 14px;
+  letter-spacing: 2px;
+}
+
 
 .title_complete_task {
   width: 635rpx;
@@ -562,9 +605,9 @@ page {
 }
 
 .title_no_complete_task {
-  width: 635rpx;
+  width: 540rpx;
   text-align: center;
-  margin: 5rpx;
+  margin-left: 55rpx;
   margin-top: 50rpx;
   letter-spacing: 2px;
   font-style: bold;
@@ -572,6 +615,28 @@ page {
   margin-bottom: 15rpx;
 }
 
+.title_no_complete_task-2 {
+  width: 440rpx;
+  text-align: center;
+  margin-left: 55rpx;
+  margin-top: 50rpx;
+  letter-spacing: 2px;
+  font-style: bold;
+  font-size: 16px;
+  margin-bottom: 15rpx;
+}
+
+
+.title_no_complete_task_cross {
+  width: 30rpx;
+  text-align: center;
+  letter-spacing: 2px;
+  font-style: bold;
+  font-size: 21px;
+  margin-bottom: 15rpx;
+  margin-top: 15rpx;
+  color: #8b8b8b;
+}
 
 .input_h60 {
   height: 60px;

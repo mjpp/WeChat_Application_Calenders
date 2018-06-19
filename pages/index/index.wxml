@@ -2,56 +2,54 @@
 <!-- get the information of users after users click the button  -->
 <button class="button-area-bt-enter" wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 进入小程序 </button>
 
-
 <!-- CALENDER -->
 <view class="page" wx:if="{{hasUserInfo}}">
 
   <!-- SHOW COMPLETE TASKS -->
-  <button class="button-area-bt-completed_tasks" bindtap="showCompletedTasks">Completed Tasks</button>
-  <scroll-view scroll-y="true" style="height: 60%;" class="drawer_box" wx:if="{{showCompletedTasks}}">
+  <button class="button-area-bt-completed_tasks" bindtap="showCompletedTasks">已完成任务</button>
+  <scroll-view scroll-y="true" style="height: 50%;" class="drawer_box" wx:if="{{showCompletedTasks}}">
     <form bindsubmit="formSubmit" bindreset="formReset">
       <view class="top grid" wx:if="{{noCompletedTask}}">
-        <view class="title_no_complete_task">目前沒有已完成任務</view>
+        <view class="title_no_complete_task">目前沒有已完成任务</view>
+        <view class="title_no_complete_task_cross" bindtap="closeCompletedTasks">x</view>
       </view>
       <checkbox-group name="checkbox" wx:if="{{!noCompletedTask}}">
         <view class="top grid">
-          <view class="title_no_complete_task">已完成任務</view>
+          <view class="title_no_complete_task">已完成任务</view>
+          <view class="title_no_complete_task_cross" bindtap="closeCompletedTasks">x</view>
         </view>
         <label wx:for="{{completedTaskItems}}" wx:for-item="item" wx:for-index='key' wx:key="{{key}}">
           <view class="top grid">
             <checkbox class="title col-0" value="{{item.taskID}}" />
-            <view class="input_base_completed input_h30 col-1">任務 {{item.taskName}}</view>
+            <view class="input_base_completed input_h30 col-1">任务 {{item.taskName}}</view>
           </view>
         </label>
       </checkbox-group>
       <view class="empty-block-receive"></view>
+      <view class="empty-block-receive" wx:if="{{noCompletedTask}}"></view>
       <button class="complete-button-confirm" formType="submit" data-submittype='returnToProcessing' wx:if="{{!noCompletedTask}}">
-        確定修改</button>
+        设置为未完成</button>
       <view class="top grid">
         <button class="complete-button-close" bindtap="closeCompletedTasks">关闭</button>
       </view>
     </form>
   </scroll-view>
   <!-- Popping window for confirmation -->
-  <scroll-view scroll-y="true" style="height: 40%;" class="drawer_popping_window" wx:if="{{showCompletedTasksSecondlayer}}">
-
+  <scroll-view scroll-y="true" style="height: 35%;" class="drawer_popping_window" wx:if="{{showCompletedTasksSecondlayer}}">
     <view class="top grid">
-      <view class="title_no_complete_task">將以下任務更改成未完成</view>
+      <view class="title_no_complete_task-2">将以下任务更改为未完成</view>
     </view>
     <view wx:for="{{completedTaskBackToProcessingTaskID}}" wx:for-item="item" wx:for-index='key' wx:key="{{key}}">
       <view class="top grid">
         <view class="title col-0"> </view>
-        <view class="input_base_completed input_h30 col-1">任務 {{item.taskName}}</view>
+        <view class="input_base_completed input_h30 col-1">任务 {{item.taskName}}</view>
       </view>
     </view>
-
     <view class="empty-block-receive"></view>
-
-    <button class="complete-button-confirm" bindtap="changeStatusBackToProcessing">確定修改</button>
+    <button class="complete-button-confirm-2" bindtap="changeStatusBackToProcessing">确定修改</button>
     <view class="top grid">
-      <button class="complete-button-close" bindtap="closeCompletedTasksSecond">关闭</button>
+      <button class="complete-button-close-2" bindtap="closeCompletedTasksSecond">关闭</button>
     </view>
-
   </scroll-view>
 
 
@@ -95,7 +93,6 @@
         <label class="title col-0"></label>
         <view class="input_h30 col-1 show-bold">{{receiveTask.taskName}}将被修改</view>
       </view>
-
       <view wx:for="{{receiveTask.selectedDays}}" wx:for-index='key' wx:key="{{key}}">
         <view class="top grid">
           <label class="title col-0" wx:if="{{key==0}}">日期</label>
@@ -105,7 +102,6 @@
           </view>
         </view>
       </view>
-
     </view>
     <view class="empty-block-receive"></view>
     <view class="top grid button-area">
@@ -118,8 +114,11 @@
   <scroll-view scroll-y="true" style="height: 60%;" class="drawer_box" wx:if="{{showModalStatus}}">
     <view wx:for="{{tempTaskID}}" wx:for-index='key' wx:key="{{key}}">
       <view class="drawer_content">
-        <view class="empty-block-top">
-          <view class="empty-block-top-decoration"></view>
+        <view class="top grid">
+          <view class="empty-block-top">
+            <view class="empty-block-top-decoration"></view>
+          </view>
+          <view class="title_no_complete_task_cross_2" bindtap="closeTask" wx:if="{{key==0}}">x</view>
         </view>
         <form bindsubmit="formSubmit" bindreset="formReset">
           <view class="top grid">
@@ -147,7 +146,7 @@
             <button class="single-button" id="{{key}}" bindtap="setTaskComplete" value="{{tempTaskID[key]}}">设为完成</button>
           </view>
           <view class="top grid">
-            <button class="single-button-close" bindtap="closeTask">关闭</button>
+            <!-- <button class="single-button-close" bindtap="closeTask">关闭</button> -->
           </view>
         </form>
       </view>
@@ -155,7 +154,6 @@
   </scroll-view>
 
   <view class="box">
-
     <!-- CHANGE-MONTH & CURRENT-DATE -->
     <view class="box-flex">
       <view class="flex-item">
@@ -221,7 +219,7 @@
         <view class="item-content bk-color-day" wx:if="{{currentDay==vo && isCurrentMonth && !currentDayStates[key] && !currentDayHaveTaskStates[key]}}">{{vo}}
         </view>
 
-        <view class="item-content have-task" wx:if="{{currentDayHaveTaskStates[key]}}">{{vo}}</view>
+        <view class="item-content have-task" style="background-color: #e3a65d;" wx:if="{{currentDayHaveTaskStates[key]}}">{{vo}}</view>
         <view class="item-content select-color-day" wx:if="{{currentDayStates[key] && !currentDayHaveTaskStates[key]}}">
           {{vo}}
         </view>
@@ -269,12 +267,6 @@
       <view class="task-content-slider-box">
         <slider name="importance" class="task-content-slider" max='5' activeColor="#ee405d" show-value bindchanging="sliderChange"></slider>
         <view class="color-block" style="background-color: {{tempColor}};"></view>
-      </view>
-      <view class="task">
-        <image class="task-img" src="./image/task-2.jpg" mode="aspectFit" />
-      </view>
-      <view class="task-content">
-        <input name="category" placeholder="输入任务分類" />
       </view>
 
       <view class="save">

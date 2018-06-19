@@ -4,7 +4,7 @@ const years = []
 const months = []
 const days = []
 const task = ''
-const colors = ["#636363", "#a67abc", "#8a97e0", "#1fb9a2", "#e3a65d", "#e44848"];
+const colors = ["#e3a65d", "#a67abc", "#8a97e0", "#1fb9a2", "#636363", "#e44848"];
 for (let i = 1990; i <= date.getFullYear(); i++) {
   years.push(i)
 }
@@ -62,7 +62,7 @@ Page({
     noCompletedTask: true,
 
     tempSliderValue: 0,
-    tempColor: "#636363",
+    tempColor: "#e3a65d",
     isTempGroup: false,
     showShareMessage: false,
     sendTask: '',
@@ -366,7 +366,7 @@ Page({
     } else if (e.detail.target.dataset.submittype == 'returnToProcessing') {
       if (e.detail.value.checkbox.length == 0) {
         wx.showToast({
-          title: '请至少选择一個任務',
+          title: '请至少选择一个任务',
           icon: 'none',
           duration: 1000
         })
@@ -376,7 +376,6 @@ Page({
           var taskKey = e.detail.value.checkbox[i];
           var taskKeyString = taskKey + '';
           var value = wx.getStorageSync(taskKeyString)
-          console.log(value);
           var singleTaskItem = {
             taskID: '',
             taskName: '',
@@ -406,7 +405,6 @@ Page({
           duration: 1000
         })
       } else {
-        // console.log('form发生了submit事件，携带数据为：', e.detail.value);
         var taskKey = ++app.globalData.taskCount;
         var that = this;
         var s = that.data.selectedDays;
@@ -481,11 +479,9 @@ Page({
         }
       }
     }
-
-
   },
   formReset: function () {
-    // console.log('form发生了reset事件');
+
   },
   startAddingTask: function () {
     this.setData({
@@ -525,21 +521,6 @@ Page({
       month: this.data.months[val[1]],
       day: this.data.days[val[2]]
     })
-  },
-  // This function is written for debug purpose, 
-  // it will show all the data in the local repository.
-  // 此功能: getTaskInfo 是用于除错使用的
-  // 将打印出所有本地储存的资料
-  getTasksInfo: function () {
-    for (var i = 1; i <= app.globalData.taskCount; i++) {
-      var taskKeyString = i + '';
-      wx.getStorage({
-        key: taskKeyString,
-        success: function (res) {
-          // console.log(res.data);
-        }
-      })
-    }
   },
   getToTask: function (keyList, keyListSize) {
     var that = this;
@@ -704,16 +685,6 @@ Page({
       name: e.detail.userInfo.nickName,
       hasUserInfo: true
     })
-  }, groupSwitchClick: function (e) {
-    this.setData({
-      isTempGroup: e.detail.value,
-      showShareMessage: e.detail.value,
-    })
-    if (this.data.isTempGroup) {
-      // open the sharing function
-    } else {
-      // close the sharing function if it's opened
-    }
   },
   closeShareMsg: function () {
     this.setData({
@@ -897,7 +868,7 @@ Page({
   },
   showCompletedTasks: function () {
     if (app.globalData.taskCount == 0) {
-      console.log('there is no data in the database');
+      // no completed task
     } else {
 
       var completedTaskItems = [];
@@ -926,7 +897,6 @@ Page({
       this.setData({
         completedTaskItems: completedTaskItems,
       })
-      // console.log(this.data.completedTaskItems);
     }
     this.setData({
       showCompletedTasks: true,
@@ -953,10 +923,6 @@ Page({
     })
   },
   changeStatusBackToProcessing: function () {
-
-
-
-    
     for (var i = 0; i < this.data.completedTaskBackToProcessingTaskID.length; i++) {
       var taskKey = this.data.completedTaskBackToProcessingTaskID[i].taskID;
       var taskKeyString = taskKey + '';
@@ -965,19 +931,6 @@ Page({
       temp.status = 'processing';
       wx.setStorageSync(taskKeyString, temp);
     }
-
-    // var id = e.currentTarget.id;
-    // var taskKey = this.data.tempTaskID[id];
-
-    // var taskKeyString = taskKey + '';
-    // var task = wx.getStorageSync(taskKeyString);
-    // var temp = Object.assign({}, task)
-    // temp.status = 'completed';
-    // wx.setStorageSync(taskKeyString, temp);
-    // this.setData({
-    //   showModalStatus: false,
-    // })
-
     var that = this;
     var currentDayHaveTaskStates = []
     var currentDayStates = []
@@ -997,11 +950,6 @@ Page({
     })
 
     this.modifyDayHaveTaskStates();
-
-
-
-
-
     this.setData({
       showCompletedTasks: false,
       showCompletedTasksSecondlayer: false,
@@ -1022,23 +970,3 @@ Page({
     return isAnyTaskCompleted;
   }
 })
-
-// const: ["#636363", "#a67abc","#8a97e0","#1fb9a2","#e3a65d","#e44848" ]
-// data: add tempSliderValue: 0;
-// add a function: sliderChange
-// < view class="task" >
-//   <image class="task-img" src= "./image/task-4.jpg" mode= "aspectFit" />
-// </view>
-// < view class="task-content-slider-box" >
-//   <slider name="importance" class="task-content-slider" max= '5' activeColor= "#ee405d" show- value bindchanging= "sliderChange" > </slider> 
-//   < view class="color-block" style= "background-color: #ee405d;" > </view>
-// < /view>
-
-
-// 新增分類
-// < view class="task" >
-//   <image class="task-img" src= "./image/task-2.jpg" mode= "aspectFit" />
-// </view>
-// < view class="task-content" >
-//   <input name="category" placeholder= "输入任务分類" />
-// </view>

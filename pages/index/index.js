@@ -75,7 +75,13 @@ Page({
   },
   onLoad: function (options) {
     // parse and store the data sent by the sharer
-    this.getInviteCode(options)
+    this.getInviteCode(options);
+    wx.getStorage({
+      key: 'taskCount',
+      success: function(res) {
+        app.globalData.taskCount = res.data
+      },
+    })
     var currentObj = this.getCurrentDayString()
     this.setData({
       currentDate: currentObj.getFullYear() + '年' + (currentObj.getMonth() + 1) + '月' + currentObj.getDate() + '日',
@@ -406,6 +412,10 @@ Page({
         })
       } else {
         var taskKey = ++app.globalData.taskCount;
+        wx.setStorage({
+          key: 'taskCount',
+          data: app.globalData.taskCount,
+        })
         var that = this;
         var s = that.data.selectedDays;
         var s1 = that.data.currentDayHaveTaskStates;
@@ -476,6 +486,10 @@ Page({
         }
         else {
           app.globalData.taskCount--;
+          wx.setStorage({
+            key: 'taskCount',
+            data: app.globalData.taskCount,
+          })
         }
       }
     }
@@ -594,15 +608,17 @@ Page({
       var days = task.selectedDays;
 
       for (var j = 0; j < days.length; j++) {
+        var y = days[j].year;
         var m = days[j].month;
         // current month
         var cm;
+        var cy = cur.substring(0,4);
         if (cur.substr(6, 1) == '月') {
           cm = cur.substr(5, 1);
         } else {
           cm = cur.substr(5, 2);
         }
-        if (m == cm) {
+        if (m == cm && y == cy) {
           if (task.status != 'completed') {
             s[days[j].key] = true;
             s1[days[j].key][s2[days[j].key]] = i;
@@ -749,6 +765,10 @@ Page({
     }
     if (!found) {
       var taskKey = ++app.globalData.taskCount;
+      wx.setStorage({
+        key: 'taskCount',
+        data: app.globalData.taskCount,
+      })
       var that = this;
       var s = that.data.selectedDays;
       var s1 = that.data.currentDayHaveTaskStates;
